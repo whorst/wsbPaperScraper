@@ -1,0 +1,8 @@
+'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s'
+#Whitespace or null                   p or c 0 or 1   Whitespace or null
+
+'\s([$]?[0-9]?[0-9]?[0-9]?[0-9]+[(p|c)]?)\s'
+#Used for getting a price
+
+'\s([A-Z]?[A-Z]?[A-Z]?[A-Z]+)\s'
+#Possibly to find a ticker
