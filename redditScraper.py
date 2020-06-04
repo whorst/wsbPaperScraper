@@ -1,7 +1,10 @@
 import re
 from idlelib.multicall import r
 
+#(\s|[][$]?[A-Z]{0,1}[A-Z]{0,1}[A-Z]{1}[A-Z]{1})[,]?\s
+
 import praw
+from Spy500Word import isPossibleTickerUsable
 from datetime import date
 
 # Valid regex to get date with p or c appended
@@ -15,30 +18,44 @@ reddit = praw.Reddit('bot1')
 # exit(0)
 
 def getStrikeDatesInComment(comment):
-    return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s', comment.body)
+    return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s', comment)
 
 def getPriceInComment(comment):
-    return re.findall(r'\s([$]?[0-9]?[0-9]?[0-9]?[0-9]+[(p|c)]?)\s', comment.body)
+    return re.findall(r'\s([$]?[0-9]?[0-9]?[0-9]?[0-9]+[(p|c)]?)\s', comment)
 
 def getTickerInComment(comment):
-    return re.findall(r'([$]?[A-Z]?[A-Z]?[A-Z]{1}[A-Z]{1})\s', comment.body)
+    return re.findall(r'[$]{0,2}\b(?!ALL|FREE|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
+
+def getvalidTickersFromPotentialTickers(potentialTickerList):
+    validTickerList = []
+    for potentialTicker in potentialTickerList:
+        formattedTicker = potentialTicker.strip()
+        formattedTicker = formattedTicker.replace('$','')
+        isValidTicker = isPossibleTickerUsable(formattedTicker)
+        if(isValidTicker):
+            validTickerList.append(formattedTicker)
+    return validTickerList
 
 def getMostCommonTickers():
     return ["MSFT", "BA", "SPY", "BABA", "SQQQ", "SPXS", "TSLA", "DIS", "AMZN", "AMD", "LYFT", "NDAQ", "QQQ", "SPCE",
             "FB", "DKNG", "ZM", "VXX", "WORK", "LULU", "MU", "DOQ", "DIS", "DAL", "HOG", "SNAP"]
 
 def getExclusionWord():
-    return ["ALL", "US", "USSR", "ITM", "AND", "RIP" "OTM", "USD","EOD", "CAD", "PE","YOLO", "I", "SAAS", "GIGS", "GTFO", "BTFD", "EXP","MINS", "PP", "DD", "LMAO", "LOL", "AMA", "TLDR", "RN", "TME", "GUH", "FUK", "WUT", "WAT","WSB", "TEH", "WTF", "FOMO","IDK", "IMO", "PLS"]
+    return ["ALL", "US", "USSR", "THE", "ITM", "AND", "RIP" "OTM", "USD", "EOD", "CAD", "PE", "YOLO", "I", "SAAS", "GIGS",
+            "GDP", "GTFO", "BTFD", "EXP", "MINS", "PP", "DD", "LMAO", "LOL", "AMA", "TLDR", "RN", "TME", "GUH", "FUK",
+            "WUT", "WAT","WSB", "TEH", "WTF", "FOMO", "IDK", "AI", "TP","IV", "DOWN", "IMO", "PLS"]
 
 def validateDatePriceAndTickerInComment(comment):
     occurencesOfStrikeDate = getStrikeDatesInComment(comment)
     occurencesOfPrice = getPriceInComment(comment)
     occurencesOfTicker = getTickerInComment(comment)
-    # if (bool(occurencesOfPrice) and bool(occurencesOfStrikeDate) ):
-    if (bool(occurencesOfStrikeDate) ):
-        print(comment.body + "\n")
-        file = open("commentFile", "a")
-        file.write(comment.body + "\n\n")
+    validTickers = getvalidTickersFromPotentialTickers(occurencesOfTicker)
+
+    #if (bool(occurencesOfPrice) and bool(occurencesOfStrikeDate) ):
+    if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
+        print(comment + "\n")
+        file = open("resources/files/commentFile", "a")
+        file.write(comment + "\n\n")
         file.close()
 
 
@@ -48,9 +65,16 @@ def printValidComments(submission_id):
             commentSubmissionId = comment.link_id[-6:]
             if(commentSubmissionId == submission_id):
                 if("http" not in comment.body):
-                    validateDatePriceAndTickerInComment(comment)
+                    validateDatePriceAndTickerInComment(comment.body)
         except UnicodeEncodeError:
             pass
+
+def testvalidComments():
+    for comment in open("resources/files/commentFile", "r"):
+        validateDatePriceAndTickerInComment(comment)
+
+
+# testvalidComments()
 
 for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
     print(submission.title)
