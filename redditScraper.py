@@ -1,10 +1,11 @@
 import re
+import Spy500Word
 from idlelib.multicall import r
 
 #(\s|[][$]?[A-Z]{0,1}[A-Z]{0,1}[A-Z]{1}[A-Z]{1})[,]?\s
 
 import praw
-from Spy500Word import isPossibleTickerUsable
+from databaseTransactions import isTickerInDatabase
 from datetime import date
 
 # Valid regex to get date with p or c appended
@@ -34,7 +35,7 @@ def getvalidTickersFromPotentialTickers(potentialTickerList):
             continue
         formattedTicker = potentialTicker.strip()
         formattedTicker = formattedTicker.replace('$','')
-        isValidTicker = isPossibleTickerUsable(formattedTicker)
+        isValidTicker = isTickerInDatabase(formattedTicker)
         if(isValidTicker):
             validTickerList.append(formattedTicker)
     return validTickerList
@@ -54,7 +55,6 @@ def validateDatePriceAndTickerInComment(comment):
     occurencesOfTicker = getTickerInComment(comment)
     validTickers = getvalidTickersFromPotentialTickers(occurencesOfTicker)
 
-    #if (bool(occurencesOfPrice) and bool(occurencesOfStrikeDate) ):
     if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
         print(comment + "\n")
         file = open("resources/files/commentFile", "a")
@@ -76,15 +76,16 @@ def testvalidComments():
     for comment in open("resources/files/commentFile", "r"):
         validateDatePriceAndTickerInComment(comment)
 
-
 # testvalidComments()
 
-for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
-    print(submission.title)
-    if ("Daily Discussion Thread for" in  submission.title):
-        printValidComments(submission.id)
-    if ("What Are Your Moves Tomorrow" in submission.title):
-        printValidComments(submission.id)
+
+
+# for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
+#     print(submission.title)
+#     if ("Daily Discussion Thread for" in  submission.title):
+#         printValidComments(submission.id)
+#     if ("What Are Your Moves Tomorrow" in submission.title):
+#         printValidComments(submission.id)
 
 # Traceback (most recent call last):
 #   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 58, in <module>
