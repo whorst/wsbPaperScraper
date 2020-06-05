@@ -19,16 +19,19 @@ reddit = praw.Reddit('bot1')
 
 def getStrikeDatesInComment(comment):
     return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s', comment)
+# //ADD Capital p and c and lowercase P and C
 
 def getPriceInComment(comment):
     return re.findall(r'\s([$]?[0-9]?[0-9]?[0-9]?[0-9]+[(p|c)]?)\s', comment)
 
 def getTickerInComment(comment):
-    return re.findall(r'[$]{0,2}\b(?!ALL|FREE|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
+    return re.findall(r'[$]{0,2}\b(?!ALL|ER|PDT|FREE|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
 
 def getvalidTickersFromPotentialTickers(potentialTickerList):
     validTickerList = []
     for potentialTicker in potentialTickerList:
+        if potentialTicker in getExclusionWord():
+            continue
         formattedTicker = potentialTicker.strip()
         formattedTicker = formattedTicker.replace('$','')
         isValidTicker = isPossibleTickerUsable(formattedTicker)
@@ -41,7 +44,7 @@ def getMostCommonTickers():
             "FB", "DKNG", "ZM", "VXX", "WORK", "LULU", "MU", "DOQ", "DIS", "DAL", "HOG", "SNAP"]
 
 def getExclusionWord():
-    return ["ALL", "US", "USSR", "THE", "ITM", "AND", "RIP" "OTM", "USD", "EOD", "CAD", "PE", "YOLO", "I", "SAAS", "GIGS",
+    return ["ALL", "US", "USSR", "THE", "ITM", "AND", "RIP" "OTM", "ASAP", "USD", "EOD", "CAD", "PE", "YOLO", "I", "SAAS", "GIGS",
             "GDP", "GTFO", "BTFD", "EXP", "MINS", "PP", "DD", "LMAO", "LOL", "AMA", "TLDR", "RN", "TME", "GUH", "FUK",
             "WUT", "WAT","WSB", "TEH", "WTF", "FOMO", "IDK", "AI", "TP","IV", "DOWN", "IMO", "PLS"]
 
