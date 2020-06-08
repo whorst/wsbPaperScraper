@@ -1,5 +1,4 @@
 import re
-import Spy500Word
 from idlelib.multicall import r
 
 #(\s|[][$]?[A-Z]{0,1}[A-Z]{0,1}[A-Z]{1}[A-Z]{1})[,]?\s
@@ -55,11 +54,29 @@ def validateDatePriceAndTickerInComment(comment):
     occurencesOfTicker = getTickerInComment(comment)
     validTickers = getvalidTickersFromPotentialTickers(occurencesOfTicker)
 
-    if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
-        print(comment + "\n")
-        file = open("resources/files/commentFile", "a")
-        file.write(comment + "\n\n")
-        file.close()
+    if(False):
+        if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
+            print(comment + "\n")
+            file = open("resources/files/commentFile", "a")
+            file.write(comment + "\n\n")
+            file.close()
+    else:
+        validTickersLength = len(validTickers)
+        occurencesOfPriceLength = len(occurencesOfPrice)
+        occurencesOfStrikeDateLength = len(occurencesOfStrikeDate)
+
+        if(validTickersLength == occurencesOfPriceLength == occurencesOfStrikeDateLength):
+            length = validTickersLength
+            i=0
+            while(i<length):
+                outFile = open("resources/files/commentFileOut", "a")
+                outFile.write("\n\n")
+                outFile.write(comment)
+                outFile.write("\n")
+                outFile.write(occurencesOfTicker[i] + " " + occurencesOfStrikeDate[i] + " " + occurencesOfPrice[i])
+                outFile.write("\n\n")
+                outFile.close()
+                i+=1
 
 
 def printValidComments(submission_id):
@@ -80,12 +97,12 @@ def testvalidComments():
 
 
 
-# for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
-#     print(submission.title)
-#     if ("Daily Discussion Thread for" in  submission.title):
-#         printValidComments(submission.id)
-#     if ("What Are Your Moves Tomorrow" in submission.title):
-#         printValidComments(submission.id)
+for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
+    print(submission.title)
+    if ("Daily Discussion Thread for" in  submission.title):
+        printValidComments(submission.id)
+    if ("What Are Your Moves Tomorrow" in submission.title):
+        printValidComments(submission.id)
 
 # Traceback (most recent call last):
 #   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 58, in <module>

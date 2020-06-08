@@ -34,13 +34,13 @@ def insertTickerIntoDatabase(ticker, connection, cursor):
         except:
             pass
 
-connection = createDatabaseConnection()
-cursor = connection.cursor()
-
-tickerFile = open("resources/files/tickerFile", "r")
-for line in tickerFile:
-    ticker = str(line.strip())
-    insertTickerIntoDatabase(ticker, connection, cursor)
-tickerFile.close()
-closeDatabaseConnection(connection)
+# connection = createDatabaseConnection()
+# cursor = connection.cursor()
+#
+# tickerFile = open("resources/files/tickerFile", "r")
+# for line in tickerFile:
+#     ticker = str(line.strip())
+#     insertTickerIntoDatabase(ticker, connection, cursor)
+# tickerFile.close()
+# closeDatabaseConnection(connection)
 
