@@ -5,6 +5,7 @@ from idlelib.multicall import r
 
 import praw
 from databaseTransactions import isTickerInDatabase
+from objects.validPositionObject import validPosition
 from datetime import date
 
 # Valid regex to get date with p or c appended
@@ -13,9 +14,6 @@ reddit = praw.Reddit('bot1')
 
 # subreddit = reddit.subreddit("https://www.reddit.com/r/wallstreetbets/")
 
-# today = date.today()
-# print(subreddit.hot())
-# exit(0)
 
 def getStrikeDatesInComment(comment):
     return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s', comment)
@@ -66,17 +64,24 @@ def validateDatePriceAndTickerInComment(comment):
         occurencesOfStrikeDateLength = len(occurencesOfStrikeDate)
 
         if(validTickersLength == occurencesOfPriceLength == occurencesOfStrikeDateLength):
-            length = validTickersLength
-            i=0
-            while(i<length):
-                outFile = open("resources/files/commentFileOut", "a")
-                outFile.write("\n\n")
-                outFile.write(comment)
-                outFile.write("\n")
-                outFile.write(occurencesOfTicker[i] + " " + occurencesOfStrikeDate[i] + " " + occurencesOfPrice[i])
-                outFile.write("\n\n")
-                outFile.close()
-                i+=1
+            printValidPositions(comment, occurencesOfPrice, occurencesOfStrikeDate, occurencesOfTicker, validTickersLength)
+
+
+def printValidPositions(comment, occurencesOfPrice, occurencesOfStrikeDate, occurencesOfTicker, validTickersLength):
+    validPositions = []
+    length = validTickersLength
+    i = 0
+    while (i < length):
+        newPosition = validPosition(occurencesOfTicker[i], occurencesOfPrice[i], occurencesOfStrikeDate[i])
+        validPositions.append(newPosition)
+        outFile = open("resources/files/commentFileOut", "a")
+        outFile.write("\n\n")
+        outFile.write(comment)
+        outFile.write("\n")
+        outFile.write(newPosition.__str__())
+        outFile.write("\n\n")
+        outFile.close()
+        i += 1
 
 
 def printValidComments(submission_id):
@@ -94,8 +99,6 @@ def testvalidComments():
         validateDatePriceAndTickerInComment(comment)
 
 # testvalidComments()
-
-
 
 for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
     print(submission.title)
