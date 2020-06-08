@@ -23,7 +23,7 @@ def getPriceInComment(comment):
     return re.findall(r'\s([$]?[0-9]?[0-9]?[0-9]?[0-9]+[(p|c)]?)\s', comment)
 
 def getTickerInComment(comment):
-    return re.findall(r'[$]{0,2}\b(?!ALL|ER|PDT|FREE|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
+    return re.findall(r'[$]{0,2}\b(?!ALL|ER|PDT|FREE|RH|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
 
 def getvalidTickersFromPotentialTickers(potentialTickerList):
     validTickerList = []
