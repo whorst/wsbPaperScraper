@@ -1,4 +1,5 @@
 import mysql.connector
+import datetime
 
 
 def createDatabaseConnection():
@@ -21,6 +22,25 @@ def isTickerInDatabase(ticker):
     row = cursor.fetchone()
     closeDatabaseConnection(connection)
     return bool(row)
+
+def getLargestValueFromDatabase():
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"SELECT MAX(idNumberID) FROM tickers.numberid;")
+    row = cursor.fetchone()
+    closeDatabaseConnection(connection)
+    return row[0]
+
+def insertIntoNumberDataBase(numberToInsert):
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+
+    now = datetime.datetime.utcnow()
+    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
+    cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
+    connection.commit()
+    closeDatabaseConnection(connection)
+
 
 def insertTickerIntoDatabase(ticker, connection, cursor):
     # add_ticker = ("INSERT INTO tickers.tickers_table(idticker) VALUES (%s)")

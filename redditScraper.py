@@ -1,18 +1,18 @@
 import re
-from idlelib.multicall import r
-
-#(\s|[][$]?[A-Z]{0,1}[A-Z]{0,1}[A-Z]{1}[A-Z]{1})[,]?\s
 
 import praw
 from databaseTransactions import isTickerInDatabase
 from objects.validPositionObject import validPosition
-from datetime import date
-
-# Valid regex to get date with p or c appended
+from paperTrading import paperTradingUtilities
 
 reddit = praw.Reddit('bot1')
 
-# subreddit = reddit.subreddit("https://www.reddit.com/r/wallstreetbets/")
+
+def isPutReferenceInComment(comment):
+    return (("put" in comment.lower()) or "puts" in comment.lower())
+
+def isCallReferenceInComment(comment):
+    return (("call" in comment.lower()) or "calls" in comment.lower())
 
 
 def getStrikeDatesInComment(comment):
@@ -30,11 +30,11 @@ def getvalidTickersFromPotentialTickers(potentialTickerList):
     for potentialTicker in potentialTickerList:
         if potentialTicker in getExclusionWord():
             continue
-        formattedTicker = potentialTicker.strip()
-        formattedTicker = formattedTicker.replace('$','')
-        isValidTicker = isTickerInDatabase(formattedTicker)
+        strippedTicker = potentialTicker.strip()
+        correctTicker = strippedTicker.replace('$','')
+        isValidTicker = isTickerInDatabase(correctTicker)
         if(isValidTicker):
-            validTickerList.append(formattedTicker)
+            validTickerList.append(correctTicker)
     return validTickerList
 
 def getMostCommonTickers():
@@ -46,25 +46,46 @@ def getExclusionWord():
             "GDP", "GTFO", "BTFD", "EXP", "MINS", "PP", "DD", "LMAO", "LOL", "AMA", "TLDR", "RN", "TME", "GUH", "FUK",
             "WUT", "WAT","WSB", "TEH", "WTF", "FOMO", "IDK", "AI", "TP","IV", "DOWN", "IMO", "PLS"]
 
-def validateDatePriceAndTickerInComment(comment):
+def returnValidpositionsInComment(comment):
     occurencesOfStrikeDate = getStrikeDatesInComment(comment)
     occurencesOfPrice = getPriceInComment(comment)
     occurencesOfTicker = getTickerInComment(comment)
+    doesPutReferenceExist = isPutReferenceInComment(comment)
+    doesCallReferenceExist = isCallReferenceInComment(comment)
+
     validTickers = getvalidTickersFromPotentialTickers(occurencesOfTicker)
 
-    if(False):
-        if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
-            print(comment + "\n")
-            file = open("resources/files/commentFile", "a")
-            file.write(comment + "\n\n")
-            file.close()
-    else:
-        validTickersLength = len(validTickers)
-        occurencesOfPriceLength = len(occurencesOfPrice)
-        occurencesOfStrikeDateLength = len(occurencesOfStrikeDate)
+    # if(False):
+    #     if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
+    #         print(comment + "\n")
+    #         file = open("resources/files/commentFile", "a")
+    #         file.write(comment + "\n\n")
+    #         file.close()
+    # else:
+    validTickersLength = len(validTickers)
+    occurencesOfPriceLength = len(occurencesOfPrice)
+    occurencesOfStrikeDateLength = len(occurencesOfStrikeDate)
 
-        if(validTickersLength == occurencesOfPriceLength == occurencesOfStrikeDateLength):
-            printValidPositions(comment, occurencesOfPrice, occurencesOfStrikeDate, occurencesOfTicker, validTickersLength)
+    if((validTickersLength == occurencesOfPriceLength == occurencesOfStrikeDateLength) and validTickersLength!=0):
+        return createNewPositions(doesCallReferenceExist, doesPutReferenceExist, occurencesOfPrice, occurencesOfStrikeDate, validTickers, validTickersLength)
+    else:
+        return []
+
+def createNewPositions(doesCallReferenceExist, doesPutReferenceExist, occurencesOfPrice, occurencesOfStrikeDate,
+                       occurencesOfTicker, validTickersLength):
+    validPositions = []
+    length = validTickersLength
+    i = 0
+    while (i < length):
+        newPosition = validPosition(occurencesOfTicker[i], occurencesOfPrice[i], occurencesOfStrikeDate[i])
+        if (newPosition.isCall == None):
+            if (doesCallReferenceExist):
+                newPosition.isCall = True
+            if (doesPutReferenceExist):
+                newPosition.isCall = False
+        validPositions.append(newPosition)
+        i += 1
+    return validPositions
 
 
 def printValidPositions(comment, occurencesOfPrice, occurencesOfStrikeDate, occurencesOfTicker, validTickersLength):
@@ -84,28 +105,36 @@ def printValidPositions(comment, occurencesOfPrice, occurencesOfStrikeDate, occu
         i += 1
 
 
-def printValidComments(submission_id):
+def searchCommentsForPositions(submission_id):
     for comment in reddit.subreddit("wallstreetbets").stream.comments():
         try:
             commentSubmissionId = comment.link_id[-6:]
             if(commentSubmissionId == submission_id):
                 if("http" not in comment.body):
-                    validateDatePriceAndTickerInComment(comment.body)
+                    validPositions = returnValidpositionsInComment(comment.body)
+                    # print(validPositions)
         except UnicodeEncodeError:
             pass
 
 def testvalidComments():
     for comment in open("resources/files/commentFile", "r"):
-        validateDatePriceAndTickerInComment(comment)
+        validPositions = returnValidpositionsInComment(comment)
+        if(validPositions):
+            for pos in validPositions:
+                if(pos.isCall != None):   ###Add Refactor Logic Here Later
+                    paperTradingUtilities.openPosition(pos, isInverse=False)
+                    paperTradingUtilities.openPosition(pos, isInverse=True)
+        else:
+            continue
 
-# testvalidComments()
+testvalidComments()
 
-for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
-    print(submission.title)
-    if ("Daily Discussion Thread for" in  submission.title):
-        printValidComments(submission.id)
-    if ("What Are Your Moves Tomorrow" in submission.title):
-        printValidComments(submission.id)
+# for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
+#     print(submission.title)
+#     if ("Daily Discussion Thread for" in  submission.title):
+#         printValidComments(submission.id)
+#     if ("What Are Your Moves Tomorrow" in submission.title):
+#         printValidComments(submission.id)
 
 # Traceback (most recent call last):
 #   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 58, in <module>
