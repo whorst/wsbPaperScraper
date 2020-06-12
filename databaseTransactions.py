@@ -37,15 +37,20 @@ def insertIntoNumberDataBase(numberToInsert):
 
     now = datetime.datetime.utcnow()
     cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
+    connection.commit()
+    closeDatabaseConnection(connection)
+
+def insertIntoNumberDataBaseInverse(numberToInsert):
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+
+    now = datetime.datetime.utcnow()
     cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
     connection.commit()
     closeDatabaseConnection(connection)
 
 
 def insertTickerIntoDatabase(ticker, connection, cursor):
-    # add_ticker = ("INSERT INTO tickers.tickers_table(idticker) VALUES (%s)")
-    # data_ticker = ("MU")
-
     ticker=ticker.strip()
     if(len(ticker)<7):
         try:
@@ -54,13 +59,4 @@ def insertTickerIntoDatabase(ticker, connection, cursor):
         except:
             pass
 
-# connection = createDatabaseConnection()
-# cursor = connection.cursor()
-#
-# tickerFile = open("resources/files/tickerFile", "r")
-# for line in tickerFile:
-#     ticker = str(line.strip())
-#     insertTickerIntoDatabase(ticker, connection, cursor)
-# tickerFile.close()
-# closeDatabaseConnection(connection)
 

@@ -55,13 +55,6 @@ def returnValidpositionsInComment(comment):
 
     validTickers = getvalidTickersFromPotentialTickers(occurencesOfTicker)
 
-    # if(False):
-    #     if (bool(validTickers) and (bool(occurencesOfPrice) or bool(occurencesOfStrikeDate))):
-    #         print(comment + "\n")
-    #         file = open("resources/files/commentFile", "a")
-    #         file.write(comment + "\n\n")
-    #         file.close()
-    # else:
     validTickersLength = len(validTickers)
     occurencesOfPriceLength = len(occurencesOfPrice)
     occurencesOfStrikeDateLength = len(occurencesOfStrikeDate)
@@ -112,7 +105,12 @@ def searchCommentsForPositions(submission_id):
             if(commentSubmissionId == submission_id):
                 if("http" not in comment.body):
                     validPositions = returnValidpositionsInComment(comment.body)
-                    # print(validPositions)
+                    if (validPositions):
+                        for pos in validPositions:
+                            if (pos.isCall != None):  ###Add Refactor Logic Here Later
+                                paperTradingUtilities.openPosition(pos)
+                    else:
+                        continue
         except UnicodeEncodeError:
             pass
 
@@ -122,68 +120,15 @@ def testvalidComments():
         if(validPositions):
             for pos in validPositions:
                 if(pos.isCall != None):   ###Add Refactor Logic Here Later
-                    paperTradingUtilities.openPosition(pos, isInverse=False)
-                    paperTradingUtilities.openPosition(pos, isInverse=True)
+                    paperTradingUtilities.openPosition(pos)
         else:
             continue
 
-testvalidComments()
+# testvalidComments()
 
-# for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
-#     print(submission.title)
-#     if ("Daily Discussion Thread for" in  submission.title):
-#         printValidComments(submission.id)
-#     if ("What Are Your Moves Tomorrow" in submission.title):
-#         printValidComments(submission.id)
-
-# Traceback (most recent call last):
-#   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 58, in <module>
-#     printValidComments(submission.id)
-#   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 46, in printValidComments
-#     for comment in reddit.subreddit("wallstreetbets").stream.comments():
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\praw\models\util.py", line 186, in stream_generator
-#     for item in reversed(list(function(limit=limit, **function_kwargs))):
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\praw\models\listing\generator.py", line 61, in __next__
-#     self._next_batch()
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\praw\models\listing\generator.py", line 71, in _next_batch
-#     self._listing = self._reddit.get(self.url, params=self.params)
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\praw\reddit.py", line 490, in get
-#     return self._objectify_request(method="GET", params=params, path=path)
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\praw\reddit.py", line 573, in _objectify_request
-#     self.request(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\praw\reddit.py", line 726, in request
-#     return self._core.request(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\prawcore\sessions.py", line 332, in request
-#     return self._request_with_retries(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\prawcore\sessions.py", line 252, in _request_with_retries
-#     return self._do_retry(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\prawcore\sessions.py", line 162, in _do_retry
-#     return self._request_with_retries(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\prawcore\sessions.py", line 252, in _request_with_retries
-#     return self._do_retry(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\prawcore\sessions.py", line 162, in _do_retry
-#     return self._request_with_retries(
-#   File "C:\Users\William\PycharmProjects\redditCommentScraper\venv\lib\site-packages\prawcore\sessions.py", line 265, in _request_with_retries
-#     raise self.STATUS_EXCEPTIONS[response.status_code](response)
-# prawcore.exceptions.ServerError: received 503 HTTP response
-
-
-
-
-
-# Traceback (most recent call last):
-#   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 27, in <module>
-#     getContinuousRedditStream(submission, submission.id)
-#   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 21, in getContinuousRedditStream
-#     file.write(comment.body + "\n\n")
-#   File "C:\Users\William\AppData\Local\Programs\Python\Python38-32\lib\encodings\cp1252.py", line 19, in encode
-#     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-# UnicodeEncodeError: 'charmap' codec can't encode characters in position 122-123: character maps to <undefined>
-# Traceback (most recent call last):
-#   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 27, in <module>
-#     getContinuousRedditStream(submission, submission.id)
-#   File "C:/Users/William/PycharmProjects/redditCommentScraper/redditScraper.py", line 21, in getContinuousRedditStream
-#     file.write(comment.body + "\n\n")
-#   File "C:\Users\William\AppData\Local\Programs\Python\Python38-32\lib\encodings\cp1252.py", line 19, in encode
-#     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-# UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f614' in position 29: character maps to <undefined>
+for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
+    print(submission.title)
+    if ("Daily Discussion Thread for" in  submission.title):
+        returnValidpositionsInComment(submission.id)
+    if ("What Are Your Moves Tomorrow" in submission.title):
+        returnValidpositionsInComment(submission.id)
