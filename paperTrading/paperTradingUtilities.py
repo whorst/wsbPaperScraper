@@ -1,6 +1,6 @@
 import alpaca_trade_api as tradeapi
-from objects import validPositionObject
-import databaseTransactions
+from database import databaseTransactions
+
 
 def openPosition(positionObject):
     api = getRestApiInterface()

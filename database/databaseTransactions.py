@@ -58,5 +58,3 @@ def insertTickerIntoDatabase(ticker, connection, cursor):
             connection.commit()
         except:
             pass
-
-

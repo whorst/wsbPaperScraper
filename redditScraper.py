@@ -1,19 +1,16 @@
 import re
 
 import praw
-from databaseTransactions import isTickerInDatabase
+from database.databaseTransactions import isTickerInDatabase
 from objects.validPositionObject import validPosition
 from paperTrading import paperTradingUtilities
 
-reddit = praw.Reddit('bot1')
-
 
 def isPutReferenceInComment(comment):
-    return (("put" in comment.lower()) or "puts" in comment.lower())
+    return bool(re.findall(r'\bput\b|\bputs\b', comment.lower()))
 
 def isCallReferenceInComment(comment):
-    return (("call" in comment.lower()) or "calls" in comment.lower())
-
+    return bool(re.findall(r'\bcall\b|\bcalls\b', comment.lower()))
 
 def getStrikeDatesInComment(comment):
     return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s', comment)
@@ -124,11 +121,13 @@ def testvalidComments():
         else:
             continue
 
-# testvalidComments()
+if __name__ == '__main__':
+    reddit = praw.Reddit('bot1')
+    # testvalidComments()
 
-for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
-    print(submission.title)
-    if ("Daily Discussion Thread for" in  submission.title):
-        returnValidpositionsInComment(submission.id)
-    if ("What Are Your Moves Tomorrow" in submission.title):
-        returnValidpositionsInComment(submission.id)
+    for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
+        print(submission.title)
+        if ("Daily Discussion Thread for" in submission.title):
+            returnValidpositionsInComment(submission.id)
+        if ("What Are Your Moves Tomorrow" in submission.title):
+            returnValidpositionsInComment(submission.id)
