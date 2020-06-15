@@ -8,19 +8,22 @@ def openPosition(positionObject):
     largestId = databaseTransactions.getLargestValueFromDatabase()
     newId = largestId+1
     ##ToDO Add logic here for short selling and inversing
-    openNormalPositions(api, newId, positionObject)
-    openInversePositions(apiInverse, newId, positionObject)
-
-
+    try:
+        openNormalPositions(api, newId, positionObject)
+        openInversePositions(apiInverse, newId, positionObject)
+    except Exception as e:
+        print("Failed fopr ID:" + str(newId))
+        pass
 def openNormalPositions(api, newId, positionObject):
-    if (positionObject.isCall == True):
-        api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
-                         client_order_id=str(newId))
-        databaseTransactions.insertIntoNumberDataBase(newId)
-    elif (positionObject.isCall == False):
-        api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
-                         client_order_id=str(newId))
-        databaseTransactions.insertIntoNumberDataBase(newId)
+        if (positionObject.isCall == True):
+            api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
+                             client_order_id=str(newId))
+            databaseTransactions.insertIntoNumberDataBase(newId)
+        elif (positionObject.isCall == False):
+            api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
+                             client_order_id=str(newId))
+            databaseTransactions.insertIntoNumberDataBase(newId)
+
 
 def openInversePositions(api, newId, positionObject):
     if (positionObject.isCall == False):

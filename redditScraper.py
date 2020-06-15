@@ -104,9 +104,10 @@ def searchCommentsForPositions(submission_id):
             commentSubmissionId = comment.link_id[-6:]
             if(commentSubmissionId == submission_id):
                 if("http" not in comment.body):
-                    validPositions = getValidTickersFromPotentialTickers(comment.body)
+                    validPositions = returnValidPositionsInComment(comment.body)
                     if (validPositions):
                         for pos in validPositions:
+                            print(pos.__str__())
                             if (pos.isCall != None):  ###Add Refactor Logic Here Later
                                 paperTradingUtilities.openPosition(pos)
                     else:
@@ -131,6 +132,6 @@ if __name__ == '__main__':
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):
-            returnValidPositionsInComment(submission.id)
+            searchCommentsForPositions(submission.id)
         if ("What Are Your Moves Tomorrow" in submission.title):
-            returnValidPositionsInComment(submission.id)
+            searchCommentsForPositions(submission.id)
