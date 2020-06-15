@@ -13,11 +13,11 @@ def isCallReferenceInComment(comment):
     return bool(re.findall(r'\bcall\b|\bcalls\b', comment.lower()))
 
 def getStrikeDatesInComment(comment):
-    return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c)]?)\s', comment)
+    return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c|P|C)]?)\s', comment)
 # //ADD Capital p and c and lowercase P and C
 
 def getPriceInComment(comment):
-    return re.findall(r'(?<!\S)\$?[0-9]?[0-9]?[0-9]{1}[0-9]{1}\.?[0-9]{1,2}?[(p|c)]?\b', comment)
+    return re.findall(r'(?<!\S)\$?[0-9]?[0-9]?[0-9]{1}[0-9]{1}\.?[0-9]{1,2}?[(p|c|P|C)]?\b', comment)
 
 def getTickerInComment(comment):
     return re.findall(r'[$]{0,2}\b(?!ALL|ER|PDT|FREE|RH|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
@@ -25,7 +25,7 @@ def getTickerInComment(comment):
 def isTickerInDatabase(ticker):
     return bool(getValidTickersInDatabase(ticker))
 
-def getvalidTickersFromPotentialTickers(potentialTickerList):
+def getValidTickersFromPotentialTickers(potentialTickerList):
     validTickerList = []
     for potentialTicker in potentialTickerList:
         if potentialTicker in getExclusionWord():
@@ -46,14 +46,14 @@ def getExclusionWord():
             "GDP", "GTFO", "BTFD", "EXP", "MINS", "PP", "DD", "LMAO", "LOL", "AMA", "TLDR", "RN", "TME", "GUH", "FUK",
             "WUT", "WAT","WSB", "TEH", "WTF", "FOMO", "IDK", "AI", "TP","IV", "DOWN", "IMO", "PLS"]
 
-def returnValidpositionsInComment(comment):
+def returnValidPositionsInComment(comment):
     occurencesOfStrikeDate = getStrikeDatesInComment(comment)
     occurencesOfPrice = getPriceInComment(comment)
     occurencesOfTicker = getTickerInComment(comment)
     doesPutReferenceExist = isPutReferenceInComment(comment)
     doesCallReferenceExist = isCallReferenceInComment(comment)
 
-    validTickers = getvalidTickersFromPotentialTickers(occurencesOfTicker)
+    validTickers = getValidTickersFromPotentialTickers(occurencesOfTicker)
 
     validTickersLength = len(validTickers)
     occurencesOfPriceLength = len(occurencesOfPrice)
@@ -104,7 +104,7 @@ def searchCommentsForPositions(submission_id):
             commentSubmissionId = comment.link_id[-6:]
             if(commentSubmissionId == submission_id):
                 if("http" not in comment.body):
-                    validPositions = returnValidpositionsInComment(comment.body)
+                    validPositions = getValidTickersFromPotentialTickers(comment.body)
                     if (validPositions):
                         for pos in validPositions:
                             if (pos.isCall != None):  ###Add Refactor Logic Here Later
@@ -116,7 +116,7 @@ def searchCommentsForPositions(submission_id):
 
 def testvalidComments():
     for comment in open("resources/files/commentFile", "r"):
-        validPositions = returnValidpositionsInComment(comment)
+        validPositions = returnValidPositionsInComment(comment)
         if(validPositions):
             for pos in validPositions:
                 if(pos.isCall != None):   ###Add Refactor Logic Here Later
@@ -131,6 +131,6 @@ if __name__ == '__main__':
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):
-            returnValidpositionsInComment(submission.id)
+            returnValidPositionsInComment(submission.id)
         if ("What Are Your Moves Tomorrow" in submission.title):
-            returnValidpositionsInComment(submission.id)
+            returnValidPositionsInComment(submission.id)

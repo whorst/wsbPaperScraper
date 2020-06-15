@@ -7,7 +7,46 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import database.databaseTransactions
+from objects import validPositionObject
 
+def createValidPositionObjects(ticker, price, date):
+    return validPositionObject.validPosition(ticker, price, date)
+
+class TestReturnValidPositionsInComment(unittest.TestCase):
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_returnValidPositionsInComment_ShouldReturnListOfValidPositionObjects_When_ValidPositionsAreFound(self):
+        mockPosition = createValidPositionObjects("MSFT", "$179C", "06/19")
+        comment = "Money $MSFT printer $179C go 06/19 Brrrr"
+        actualPosition = redditScraper.returnValidPositionsInComment(comment)
+        self.assertEqual(mockPosition.ticker, actualPosition[0].ticker)
+        self.assertEqual(mockPosition.price, actualPosition[0].price)
+        self.assertEqual(mockPosition.strikeDate, actualPosition[0].strikeDate)
+        self.assertEqual(mockPosition.isCall, actualPosition[0].isCall)
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_returnValidPositionsInComment_ShouldReturnEmptyList_When_MismatchOfPrice(self):
+        comment = "300C Money $23.30 $MSFT printer $179C go 06/19 Brrrr"
+        actualPosition = redditScraper.returnValidPositionsInComment(comment)
+        self.assertEqual([], actualPosition)
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT", "AAPL", "HBAN"]))
+    def test_returnValidPositionsInComment_ShouldReturnEmptyList_When_MismatchOfTicker(self):
+        comment = "AAPL Money $MSFT printer $179C go HBAN 06/19 Brrrr"
+        actualPosition = redditScraper.returnValidPositionsInComment(comment)
+        self.assertEqual([], actualPosition)    \
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_returnValidPositionsInComment_ShouldReturnEmptyList_When_MismatchOfDate(self):
+        comment = "7/13 Money 2/11C printer $179C MSFT go 06/19 Brrrr"
+        actualPosition = redditScraper.returnValidPositionsInComment(comment)
+        self.assertEqual([], actualPosition)
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT", "AAPL", "HBAN"]))
+    ##This test is broken. Fix Later
+    def test_returnValidPositionsInComment_ShouldReturnMultiplePositions_When_MultipleValidPositions(self):
+        comment = "AAPL MSFT  HBAN Money printer 45C $179C 11 go 06/19 2/7c 4/18P Brrrr"
+        actualPosition = redditScraper.returnValidPositionsInComment(comment)
+        self.assertEqual(3, len(actualPosition))
 
 class TestGetValidTickersFromPotentialTickerList(unittest.TestCase):
     #I can't mock functions in files other than the file that I'm testing
@@ -56,6 +95,10 @@ class TestPrice(unittest.TestCase):
     def test_PriceInComment_shouldReturnPriceList_When_PriceContainsPutAndCall(self):
         comment = "9/16 $300p 300.50c ewrgretger"
         self.assertEqual(["$300p", "300.50c"], redditScraper.getPriceInComment(comment))
+
+    def test_PriceInComment_shouldReturnPriceList_When_PriceContainsPutAndCallCapital(self):
+        comment = "9/16 $300P 300.50C ewrgretger"
+        self.assertEqual(["$300P", "300.50C"], redditScraper.getPriceInComment(comment))
 
     def test_PriceInComment_shouldReturnEmptyList_When_PriceUnderTenDollars(self):
         comment = "9/16 $9.99 $8 ewrgretger"
