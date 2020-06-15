@@ -50,15 +50,15 @@ class TestReturnValidPositionsInComment(unittest.TestCase):
 
 class TestGetValidTickersFromPotentialTickerList(unittest.TestCase):
     #I can't mock functions in files other than the file that I'm testing
-    @patch('redditScraper.isTickerInDatabase', MagicMock(return_value=False))
-    def test_getValidTickersFromPotentialTickers_ShouldReturnValidTickers_When_ValidTickersInComment(self):
-            potentialTickerList = ["MSFT", "$MSFT", "GUH", "$SMH", "GMAIL", "RIP"]
-            self.assertEqual([], redditScraper.getvalidTickersFromPotentialTickers(potentialTickerList))
-
     @patch('redditScraper.isTickerInDatabase', MagicMock(return_value=True))
+    def test_getValidTickersFromPotentialTickers_ShouldReturnValidTickers_When_ValidTickersInComment(self):
+            potentialTickerList = ["MSFT", "$MSFT", "GUH", "$SMH", "FUK", "OTM"]
+            self.assertEqual(["MSFT", "MSFT", "SMH"], redditScraper.getValidTickersFromPotentialTickers(potentialTickerList))
+
+    @patch('redditScraper.isTickerInDatabase', MagicMock(return_value=False))
     def test_getValidTickersFromPotentialTickers_ShouldReturnNoTickers_When_NoValidTickersInComment(self):
             potentialTickerList = ["MSFT", "$MSFT", "$SMH"]
-            self.assertEqual([], redditScraper.getvalidTickersFromPotentialTickers(potentialTickerList))
+            self.assertEqual([], redditScraper.getValidTickersFromPotentialTickers(potentialTickerList))
 
 class TestTicker(unittest.TestCase):
     def test_TickerInComment_shouldReturnTicker_When_ValidTickerInComment(self):
@@ -102,7 +102,7 @@ class TestPrice(unittest.TestCase):
 
     def test_PriceInComment_shouldReturnEmptyList_When_PriceUnderTenDollars(self):
         comment = "9/16 $9.99 $8 ewrgretger"
-        self.assertEqual([], redditScraper.getPriceInComment(comment))
+        self.assertEqual(["$9.99"], redditScraper.getPriceInComment(comment))
 
 class TestStrikeDate(unittest.TestCase):
     def test_StrikeDateInComment_shouldReturnTrue_When_ValidDateAtFrontOnfComment(self):
