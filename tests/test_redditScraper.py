@@ -105,6 +105,10 @@ class TestPrice(unittest.TestCase):
         self.assertEqual([], redditScraper.getPriceInComment(comment))
 
 class TestStrikeDate(unittest.TestCase):
+    def test_StrikeDateInComment_shouldReturnTrue_When_ValidDateAtFrontOnfComment(self):
+        comment = "9/16 wngrwng"
+        self.assertTrue(redditScraper.getStrikeDatesInComment(comment))
+
     def test_StrikeDateInComment_shouldReturnTrue_When_ValidDateInComment(self):
         comment = "lsnrw 9/16 wngrwng"
         self.assertTrue(redditScraper.getStrikeDatesInComment(comment))
@@ -119,10 +123,6 @@ class TestStrikeDate(unittest.TestCase):
 
     def test_StrikeDateInComment_shouldReturnFalse_When_InvalidDateInComment(self):
         comment = "lsnrw9/16p5/6wngrwng"
-        self.assertFalse(redditScraper.getStrikeDatesInComment(comment))
-
-    def test_StrikeDateInComment_shouldReturnFalse_When_DateWithYearInComment(self):
-        comment = "lsnrw 2/2020 wngrwng"
         self.assertFalse(redditScraper.getStrikeDatesInComment(comment))
 
     def test_StrikeDateInComment_shouldReturnFalse_When_DateWithYearInComment(self):

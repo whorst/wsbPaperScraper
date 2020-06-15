@@ -13,11 +13,11 @@ def isCallReferenceInComment(comment):
     return bool(re.findall(r'\bcall\b|\bcalls\b', comment.lower()))
 
 def getStrikeDatesInComment(comment):
-    return re.findall(r'\s([0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c|P|C)]?)\s', comment)
+    return re.findall(r'(?<!\S)[0-9]{0,1}[0-9]{1}/[0-9]{1}[0-9]{0,1}[(p|c|P|C)]?(?!\S)', comment)
 # //ADD Capital p and c and lowercase P and C
 
 def getPriceInComment(comment):
-    return re.findall(r'(?<!\S)\$?[0-9]?[0-9]?[0-9]{1}[0-9]{1}\.?[0-9]{1,2}?[(p|c|P|C)]?\b', comment)
+    return re.findall(r'(?<!\S)\$?[0-9]?[0-9]?[0-9]?[0-9]{1}\.?[0-9]{1,2}?[(p|c|P|C)]?(?!\S)', comment)
 
 def getTickerInComment(comment):
     return re.findall(r'[$]{0,2}\b(?!ALL|ER|PDT|FREE|RH|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
