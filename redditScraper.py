@@ -1,7 +1,7 @@
 import re
 
 import praw
-from database.databaseTransactions import isTickerInDatabase
+from database.databaseTransactions import getValidTickersInDatabase
 from objects.validPositionObject import validPosition
 from paperTrading import paperTradingUtilities
 
@@ -17,10 +17,13 @@ def getStrikeDatesInComment(comment):
 # //ADD Capital p and c and lowercase P and C
 
 def getPriceInComment(comment):
-    return re.findall(r'\s([$]?[0-9]?[0-9]?[0-9]?[0-9]+[(p|c)]?)\s', comment)
+    return re.findall(r'(?<!\S)\$?[0-9]?[0-9]?[0-9]{1}[0-9]{1}\.?[0-9]{1,2}?[(p|c)]?\b', comment)
 
 def getTickerInComment(comment):
     return re.findall(r'[$]{0,2}\b(?!ALL|ER|PDT|FREE|RH|ATH|NBA|NFL|NHL|UP|FUCK|US|USSR|THE|ITM|AND|RIP|OTM|USD|EOD|CAD|PE|YOLO|I|SAAS|GIGS|GDP|GTFO|BTFD|EXP|MINS|PP|DD|LMAO|LOL|AMA|TLDR|RN|TME|GUH|FUK|WUT|WAT|WSB|TEH|WTF|FOMO|ROPE|IDK|AI|TP|IV|DOWN|IMO|PLS\b)[A-Z]{1,4}\b', comment)
+
+def isTickerInDatabase(ticker):
+    return bool(getValidTickersInDatabase(ticker))
 
 def getvalidTickersFromPotentialTickers(potentialTickerList):
     validTickerList = []

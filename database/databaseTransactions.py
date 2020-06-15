@@ -15,13 +15,13 @@ def closeDatabaseConnection(connection):
     connection.cursor().close()
     connection.close()
 
-def isTickerInDatabase(ticker):
+def getValidTickersInDatabase(ticker):
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
     cursor.execute(f"SELECT idticker FROM tickers.tickers_table where idticker = \'{ticker}\';")
     row = cursor.fetchone()
     closeDatabaseConnection(connection)
-    return bool(row)
+    return row
 
 def getLargestValueFromDatabase():
     connection = createDatabaseConnection()
