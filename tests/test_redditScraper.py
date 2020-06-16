@@ -9,8 +9,57 @@ from unittest.mock import patch
 import database.databaseTransactions
 from objects import validPositionObject
 
+class Comment:
+    link_id = None
+    body = None
+    def __init__(self, link_id, body):
+        self.body = body
+        self.link_id = link_id
+
+
 def createValidPositionObjects(ticker, price, date):
     return validPositionObject.validPosition(ticker, price, date)
+
+def createCommentObject(body, link_id):
+    return Comment(link_id, body)
+
+class TestSearchCommentsForPositions(unittest.TestCase):
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_searchCommentsForPositions_ShouldCreateOpenPosition_When_CommentIsValid(self):
+        commentObject = createCommentObject("Im gonna get my money MSFT 370p 4/14", "0000123567")
+        submission_id = "123567"
+        with patch('paperTrading.paperTradingUtilities.openPosition'
+                   ) as openPosition:
+            redditScraper.searchCommentsForPositions(submission_id, commentObject)
+            openPosition.assert_called()
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_searchCommentsForPositions_ShouldNotCreateOpenPosition_When_CommentIdAndSubmissionIdAreDifferent(self):
+        commentObject = createCommentObject("Im gonna get my money MSFT 370p 4/14", "0000666666")
+        submission_id = "123567"
+        with patch('paperTrading.paperTradingUtilities.openPosition'
+                   ) as openPosition:
+            redditScraper.searchCommentsForPositions(submission_id, commentObject)
+            openPosition.assert_not_called()
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_searchCommentsForPositions_ShouldNotCreateOpenPosition_When_CommentContainsUrl(self):
+        commentObject = createCommentObject("Im gonna get my money https://www.google.com MSFT 370p 4/14", "0000666666")
+        submission_id = "123567"
+        with patch('paperTrading.paperTradingUtilities.openPosition'
+                   ) as openPosition:
+            redditScraper.searchCommentsForPositions(submission_id, commentObject)
+            openPosition.assert_not_called()
+
+    @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    def test_searchCommentsForPositions_ShouldNotCreateOpenPosition_When_UnableToDetermineCallOrPut(self):
+        commentObject = createCommentObject("Im gonna get my money MSFT 370 4/14", "0000666666")
+        submission_id = "123567"
+        with patch('paperTrading.paperTradingUtilities.openPosition'
+                   ) as openPosition:
+            redditScraper.searchCommentsForPositions(submission_id, commentObject)
+            openPosition.assert_not_called()
 
 class TestReturnValidPositionsInComment(unittest.TestCase):
     @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))

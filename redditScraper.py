@@ -98,20 +98,16 @@ def printValidPositions(comment, occurencesOfPrice, occurencesOfStrikeDate, occu
         i += 1
 
 
-def searchCommentsForPositions(submission_id):
-    for comment in reddit.subreddit("wallstreetbets").stream.comments():
+def searchCommentsForPositions(submission_id, commentObject):
         try:
-            commentSubmissionId = comment.link_id[-6:]
-            if(commentSubmissionId == submission_id):
-                if("http" not in comment.body):
-                    validPositions = returnValidPositionsInComment(comment.body)
-                    if (validPositions):
-                        for pos in validPositions:
-                            print(pos.__str__())
-                            if (pos.isCall != None):  ###Add Refactor Logic Here Later
-                                paperTradingUtilities.openPosition(pos)
-                    else:
-                        continue
+            commentSubmissionId = commentObject.link_id[-6:]
+            if((commentSubmissionId == submission_id) and ("http" not in commentObject.body)):
+                validPositions = returnValidPositionsInComment(commentObject.body)
+                if (validPositions):
+                    for pos in validPositions:
+                        print(pos.__str__())
+                        if (pos.isCall != None):  ###Add Refactor Logic Here Later
+                            paperTradingUtilities.openPosition(pos)
         except UnicodeEncodeError:
             pass
 
@@ -132,6 +128,9 @@ if __name__ == '__main__':
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):
-            searchCommentsForPositions(submission.id)
+            for commentObject in reddit.subreddit("wallstreetbets").stream.comments():
+                searchCommentsForPositions(submission.id, commentObject)
+
         if ("What Are Your Moves Tomorrow" in submission.title):
-            searchCommentsForPositions(submission.id)
+            for comment in reddit.subreddit("wallstreetbets").stream.comments():
+                searchCommentsForPositions(submission.id, commentObject)
