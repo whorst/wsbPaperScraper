@@ -17,37 +17,40 @@ def closeDatabaseConnection(connection):
 
 def getValidTickersInDatabase(ticker):
     connection = createDatabaseConnection()
-    cursor = connection.cursor(buffered=True)
-    cursor.execute(f"SELECT idticker FROM tickers.tickers_table where idticker = \'{ticker}\';")
-    row = cursor.fetchone()
-    closeDatabaseConnection(connection)
-    return row
+    with connection:
+        cursor = connection.cursor(buffered=True)
+        cursor.execute(f"SELECT idticker FROM tickers.tickers_table where idticker = \'{ticker}\';")
+        row = cursor.fetchone()
+        closeDatabaseConnection(connection)
+        return row
 
 def getLargestValueFromDatabase():
     connection = createDatabaseConnection()
-    cursor = connection.cursor(buffered=True)
-    cursor.execute(f"SELECT MAX(idNumberID) FROM tickers.numberid;")
-    row = cursor.fetchone()
-    closeDatabaseConnection(connection)
-    return row[0]
+    with connection:
+        cursor = connection.cursor(buffered=True)
+        cursor.execute(f"SELECT MAX(idNumberID) FROM tickers.numberid;")
+        row = cursor.fetchone()
+        closeDatabaseConnection(connection)
+        return row[0]
+
 
 def insertIntoNumberDataBase(numberToInsert):
     connection = createDatabaseConnection()
-    cursor = connection.cursor(buffered=True)
-
-    now = datetime.datetime.utcnow()
-    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
-    connection.commit()
-    closeDatabaseConnection(connection)
+    with connection:
+        cursor = connection.cursor(buffered=True)
+        now = datetime.datetime.utcnow()
+        cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
+        connection.commit()
+        closeDatabaseConnection(connection)
 
 def insertIntoNumberDataBaseInverse(numberToInsert):
     connection = createDatabaseConnection()
-    cursor = connection.cursor(buffered=True)
-
-    now = datetime.datetime.utcnow()
-    cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
-    connection.commit()
-    closeDatabaseConnection(connection)
+    with connection:
+        cursor = connection.cursor(buffered=True)
+        now = datetime.datetime.utcnow()
+        cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
+        connection.commit()
+        closeDatabaseConnection(connection)
 
 
 def insertTickerIntoDatabase(ticker, connection, cursor):
