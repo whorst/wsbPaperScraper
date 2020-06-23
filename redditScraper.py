@@ -124,6 +124,7 @@ def testvalidComments():
 if __name__ == '__main__':
     reddit = praw.Reddit('bot1')
     # testvalidComments()
+    #TODO: DB Eviction Given day is strike date
 
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)

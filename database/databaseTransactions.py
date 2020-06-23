@@ -17,21 +17,19 @@ def closeDatabaseConnection(connection):
 
 def getValidTickersInDatabase(ticker):
     connection = createDatabaseConnection()
-    with connection:
-        cursor = connection.cursor(buffered=True)
-        cursor.execute(f"SELECT idticker FROM tickers.tickers_table where idticker = \'{ticker}\';")
-        row = cursor.fetchone()
-        closeDatabaseConnection(connection)
-        return row
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"SELECT idticker FROM tickers.tickers_table where idticker = \'{ticker}\';")
+    row = cursor.fetchone()
+    closeDatabaseConnection(connection)
+    return row
 
 def getLargestValueFromDatabase():
     connection = createDatabaseConnection()
-    with connection:
-        cursor = connection.cursor(buffered=True)
-        cursor.execute(f"SELECT MAX(idNumberID) FROM tickers.numberid;")
-        row = cursor.fetchone()
-        closeDatabaseConnection(connection)
-        return row[0]
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"SELECT MAX(idNumberID) FROM tickers.numberid;")
+    row = cursor.fetchone()
+    closeDatabaseConnection(connection)
+    return row[0]
 
 
 def insertIntoNumberDataBase(numberToInsert, strikeDate):
@@ -45,12 +43,11 @@ def insertIntoNumberDataBase(numberToInsert, strikeDate):
 
 def insertIntoNumberDataBaseInverse(numberToInsert, strikeDate):
     connection = createDatabaseConnection()
-    with connection:
-        cursor = connection.cursor(buffered=True)
-        now = datetime.datetime.utcnow()
-        cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded,expiryDate)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\');")
-        connection.commit()
-        closeDatabaseConnection(connection)
+    cursor = connection.cursor(buffered=True)
+    now = datetime.datetime.utcnow()
+    cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded,expiryDate)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\');")
+    connection.commit()
+    closeDatabaseConnection(connection)
 
 
 def insertTickerIntoDatabase(ticker, connection, cursor):
