@@ -4,6 +4,7 @@ class validPosition:
     ticker = None
     price = None
     strikeDate = None
+    strikeDateTime = None
     isCall = None
 
     def __init__(self, newTicker, newPrice, newStrikeDate):
@@ -15,6 +16,9 @@ class validPosition:
     def __str__(self):
         return "{0} {1} {2} isCall: {3}".format(self.ticker, self.price, self.strikeDate, self.isCall)
 
+    def getDateTimeObjectFromStrikeDate(self, day, month, year):
+        return datetime(int(year), int(month), int(day))
+
     def formatStrikeDate(self, date):
         numArray = date.split("/")
         strikeMonth = numArray[0].lstrip('0')
@@ -25,11 +29,9 @@ class validPosition:
         if (strikeMonth < currentMonth):
             currentYear = str(int(currentYear) + 1)
 
+        self.strikeDateTime = self.getDateTimeObjectFromStrikeDate(strikeDay, strikeMonth, currentYear)
+
         return "{}/{}/{}".format(strikeMonth, strikeDay, currentYear)
-
-
-    def setCorrectStrikDate(self):
-        print("Yrs")
 
     def getPutOrCall(self):
         priceLastCharacter = self.price[-1]

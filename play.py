@@ -2,7 +2,8 @@ import re
 import enchant
 from nltk.corpus import words
 from objects.validPositionObject import validPosition
+from database import databaseTransactions
 
 position = validPosition("MSFT", "100", "04/19")
 
-print(position.strikeDate)
+databaseTransactions.insertIntoNumberDataBase(2, position.strikeDateTime)

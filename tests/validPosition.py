@@ -23,7 +23,7 @@ class TestValidPositionObject(unittest.TestCase):
         self.assertEqual("6/19/2020", position.strikeDate)
 
     @patch.object(objects.validPositionObject, 'datetime', Mock(wraps=datetime.datetime))
-    def test_formatDate_ShouldFormateYearAsNextYear_When_StrikeDateMonthEarlierThanCurrentMonth(self):
+    def test_formatDate_ShouldFormatYearAsNextYear_When_StrikeDateMonthEarlierThanCurrentMonth(self):
         objects.validPositionObject.datetime.utcnow.return_value = datetime.datetime(2020, 2, 3)
         position = validPosition("MSFT", "100", "01/01")
         self.assertEqual("1/1/2021", position.strikeDate)

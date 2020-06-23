@@ -82,7 +82,7 @@ class TestReturnValidPositionsInComment(unittest.TestCase):
     def test_returnValidPositionsInComment_ShouldReturnEmptyList_When_MismatchOfTicker(self):
         comment = "AAPL Money $MSFT printer $179C go HBAN 06/19 Brrrr"
         actualPosition = redditScraper.returnValidPositionsInComment(comment)
-        self.assertEqual([], actualPosition)    \
+        self.assertEqual([], actualPosition)
 
     @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
     def test_returnValidPositionsInComment_ShouldReturnEmptyList_When_MismatchOfDate(self):

@@ -19,22 +19,22 @@ def openNormalPositions(api, newId, positionObject):
         if (positionObject.isCall == True):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
                              client_order_id=str(newId))
-            databaseTransactions.insertIntoNumberDataBase(newId)
+            databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDate)
         elif (positionObject.isCall == False):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
                              client_order_id=str(newId))
-            databaseTransactions.insertIntoNumberDataBase(newId)
+            databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDate)
 
 
 def openInversePositions(api, newId, positionObject):
     if (positionObject.isCall == False):
         api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
                          client_order_id=str(newId))
-        databaseTransactions.insertIntoNumberDataBaseInverse(newId)
+        databaseTransactions.insertIntoNumberDataBaseInverse(newId, positionObject.strikeDate)
     elif (positionObject.isCall == True):
         api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
                          client_order_id=str(newId))
-        databaseTransactions.insertIntoNumberDataBaseInverse(newId)
+        databaseTransactions.insertIntoNumberDataBaseInverse(newId, positionObject.strikeDate)
 
 
 def getRestApiInterface():

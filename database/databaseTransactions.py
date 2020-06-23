@@ -34,21 +34,21 @@ def getLargestValueFromDatabase():
         return row[0]
 
 
-def insertIntoNumberDataBase(numberToInsert):
+def insertIntoNumberDataBase(numberToInsert, strikeDate):
     connection = createDatabaseConnection()
-    with connection:
-        cursor = connection.cursor(buffered=True)
-        now = datetime.datetime.utcnow()
-        cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
-        connection.commit()
-        closeDatabaseConnection(connection)
 
-def insertIntoNumberDataBaseInverse(numberToInsert):
+    cursor = connection.cursor(buffered=True)
+    now = datetime.datetime.utcnow()
+    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded,expiryDate)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\');")
+    connection.commit()
+    closeDatabaseConnection(connection)
+
+def insertIntoNumberDataBaseInverse(numberToInsert, strikeDate):
     connection = createDatabaseConnection()
     with connection:
         cursor = connection.cursor(buffered=True)
         now = datetime.datetime.utcnow()
-        cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\');")
+        cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded,expiryDate)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\');")
         connection.commit()
         closeDatabaseConnection(connection)
 
