@@ -14,6 +14,7 @@ def openPosition(positionObject):
     except Exception as e:
         print("Failed fopr ID:" + str(newId))
         pass
+
 def openNormalPositions(api, newId, positionObject):
         if (positionObject.isCall == True):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
