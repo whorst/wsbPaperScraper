@@ -23,6 +23,17 @@ def getValidTickersInDatabase(ticker):
     closeDatabaseConnection(connection)
     return row
 
+def getRecordsWithMatchingExpiryFromDatabase(expiry):
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"SELECT idnumberid FROM tickers.numberid where expiryDate = \'{expiry}\*';")
+    rows = cursor.fetchall()
+    closeDatabaseConnection(connection)
+    newRows = []
+    for tuple in rows:
+        newRows.append(tuple[0])
+    return newRows
+
 def getLargestValueFromDatabase():
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
