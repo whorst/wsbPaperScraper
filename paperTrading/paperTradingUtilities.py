@@ -14,8 +14,26 @@ def openPosition(positionObject):
         openNormalPositions(api, newId, positionObject)
         openInversePositions(apiInverse, newId, positionObject)
     except Exception as e:
-        print("Failed for ID:" + str(newId))
+        print("Opening Position Failed for ID:" + str(newId))
         pass
+
+def closeNormalPositions(api, id):
+    api.close_position(id)
+
+def closeInversePositions(api, id):
+    api.close_position(id)
+
+
+def closePositions(idList):
+    api = getRestApiInterface()
+    apiInverse = getRestApiInterfaceInverse()
+    for id in idList:
+        # try:
+        closeNormalPositions(api, id)
+        closeInversePositions(apiInverse, id)
+    # except Exception as e:
+        print("Closing Position Failed for ID:" + str(id))
+            # pass
 
 def openNormalPositions(api, newId, positionObject):
         if (positionObject.isCall == True):
@@ -27,7 +45,6 @@ def openNormalPositions(api, newId, positionObject):
                              client_order_id=str(newId))
             databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime)
 
-
 def openInversePositions(api, newId, positionObject):
     if (positionObject.isCall == False):
         api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
@@ -38,6 +55,9 @@ def openInversePositions(api, newId, positionObject):
                          client_order_id=str(newId))
         databaseTransactions.insertIntoNumberDataBaseInverse(newId, positionObject.strikeDateTime)
 
+def closePositionsById():
+    api = getRestApiInterface()
+    apiInverse = getRestApiInterfaceInverse()
 
 def getRestApiInterface():
     #authentication and connection details

@@ -2,8 +2,11 @@ import re
 
 import praw
 from database.databaseTransactions import getValidTickersInDatabase
+from database.databaseTransactions import getRecordsWithMatchingExpiryFromDatabase
 from objects.validPositionObject import validPosition
+from paperTrading.paperTradingUtilities import closePositions
 from paperTrading import paperTradingUtilities
+import datetime
 
 
 def isPutReferenceInComment(comment):
@@ -121,10 +124,23 @@ def testvalidComments():
         else:
             continue
 
+def getCurrentDay():
+    return datetime.datetime.utcnow().strftime('%Y-%m-%d')
+
+def getPositionsThatHaveExpired():
+    # day = getCurrentDay()
+    me = datetime.datetime(2020, 6, 26)
+    x = me.strftime('%Y-%m-%d')
+    return getRecordsWithMatchingExpiryFromDatabase(x)
+
+
 if __name__ == '__main__':
     reddit = praw.Reddit('bot1')
     # testvalidComments()
     #TODO: DB Eviction Given day is strike date
+
+    # positionsToClose = getPositionsThatHaveExpired()
+    # closePositions(positionsToClose)
 
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
