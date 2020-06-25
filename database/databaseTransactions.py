@@ -1,7 +1,7 @@
 import mysql.connector
 import datetime
 
-
+# I need to write logic to delete the position out of the DB after I have retrieved it
 def createDatabaseConnection():
 
     cnx = mysql.connector.connect(user='root', password='password',
@@ -43,20 +43,20 @@ def getLargestValueFromDatabase():
     return row[0]
 
 
-def insertIntoNumberDataBase(numberToInsert, strikeDate):
+def insertIntoNumberDataBase(numberToInsert, strikeDate, isCall):
     connection = createDatabaseConnection()
 
     cursor = connection.cursor(buffered=True)
     now = datetime.datetime.utcnow()
-    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded,expiryDate)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\');")
+    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded,expiryDate,isCall)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\',{isCall});")
     connection.commit()
     closeDatabaseConnection(connection)
 
-def insertIntoNumberDataBaseInverse(numberToInsert, strikeDate):
+def insertIntoNumberDataBaseInverse(numberToInsert, strikeDate, isCall):
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
     now = datetime.datetime.utcnow()
-    cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded,expiryDate)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\');")
+    cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded,expiryDate,isCall)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\',{isCall});")
     connection.commit()
     closeDatabaseConnection(connection)
 
