@@ -1,5 +1,6 @@
 import mysql.connector
 import datetime
+from objects.closePositionObject import closePosition
 
 # I need to write logic to delete the position out of the DB after I have retrieved it
 def createDatabaseConnection():
@@ -26,12 +27,12 @@ def getValidTickersInDatabase(ticker):
 def getRecordsWithMatchingExpiryFromDatabase(expiry):
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
-    cursor.execute(f"SELECT idnumberid FROM tickers.numberid where expiryDate = \'{expiry}\*';")
+    cursor.execute(f"SELECT idnumberid,isCall FROM tickers.numberid where expiryDate = \'{expiry}\*';")
     rows = cursor.fetchall()
     closeDatabaseConnection(connection)
     newRows = []
     for tuple in rows:
-        newRows.append(tuple[0])
+        newRows.append(closePosition(tuple[0], tuple[1]))
     return newRows
 
 def getLargestValueFromDatabase():

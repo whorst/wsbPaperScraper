@@ -1,6 +1,7 @@
 import alpaca_trade_api as tradeapi
 from database import databaseTransactions
 
+# Add logic for adding ticker to the DB
 
 def openPosition(positionObject):
     api = getRestApiInterface()
@@ -17,20 +18,22 @@ def openPosition(positionObject):
         print("Opening Position Failed for ID:" + str(newId))
         pass
 
-def closeNormalPositions(api, id):
+def closeNormalPositions(api, id, isCall):
     api.close_position(id)
 
-def closeInversePositions(api, id):
+def closeInversePositions(api, id, isCallInverse):
     api.close_position(id)
 
 
-def closePositions(idList):
+def closePositions(closePositionList):
     api = getRestApiInterface()
     apiInverse = getRestApiInterfaceInverse()
-    for id in idList:
+    for position in closePositionList:
         try:
-            closeNormalPositions(api, id)
-            closeInversePositions(apiInverse, id)
+            print(position)
+            exit()
+            closeNormalPositions(api, id, position.isCall)
+            closeInversePositions(apiInverse, id, position.isCallInverse)
         except Exception as e:
             print("Closing Position Failed for ID:" + str(id))
             pass

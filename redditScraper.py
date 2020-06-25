@@ -130,8 +130,8 @@ def getCurrentDay():
 def getPositionsThatHaveExpired():
     # day = getCurrentDay()
     me = datetime.datetime(2020, 6, 26)
-    x = me.strftime('%Y-%m-%d')
-    return getRecordsWithMatchingExpiryFromDatabase(x)
+    day = me
+    return getRecordsWithMatchingExpiryFromDatabase(day.strftime('%Y-%m-%d'))
 
 
 if __name__ == '__main__':
@@ -139,8 +139,8 @@ if __name__ == '__main__':
     # testvalidComments()
     #TODO: DB Eviction Given day is strike date
 
-    # positionsToClose = getPositionsThatHaveExpired()
-    # closePositions(positionsToClose)
+    positionsToClose = getPositionsThatHaveExpired()
+    closePositions(positionsToClose)
 
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
