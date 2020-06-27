@@ -128,10 +128,12 @@ def getCurrentDay():
     return datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
 def getPositionsThatHaveExpired():
-    # day = getCurrentDay()
-    me = datetime.datetime(2020, 6, 26)
-    day = me
-    return getRecordsWithMatchingExpiryFromDatabase(day.strftime('%Y-%m-%d'))
+    day = getCurrentDay()
+    return getRecordsWithMatchingExpiryFromDatabase(day)
+
+    # me = datetime.datetime(2020, 6, 26)
+    # day = me
+    # return getRecordsWithMatchingExpiryFromDatabase(day.strftime('%Y-%m-%d'))
 
 
 if __name__ == '__main__':
@@ -142,6 +144,7 @@ if __name__ == '__main__':
     positionsToClose = getPositionsThatHaveExpired()
     closePositions(positionsToClose)
 
+    exit()
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):

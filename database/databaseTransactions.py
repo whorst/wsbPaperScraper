@@ -27,12 +27,12 @@ def getValidTickersInDatabase(ticker):
 def getRecordsWithMatchingExpiryFromDatabase(expiry):
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
-    cursor.execute(f"SELECT idnumberid,isCall FROM tickers.numberid where expiryDate = \'{expiry}\*';")
+    cursor.execute(f"SELECT idnumberid,isCall,tickerSymbol FROM tickers.numberid where expiryDate = \'{expiry}\*';")
     rows = cursor.fetchall()
     closeDatabaseConnection(connection)
     newRows = []
-    for tuple in rows:
-        newRows.append(closePosition(tuple[0], tuple[1]))
+    for databaseTuple in rows:
+        newRows.append(closePosition(databaseTuple[0], databaseTuple[1], databaseTuple[2]))
     return newRows
 
 def getLargestValueFromDatabase():
@@ -44,23 +44,17 @@ def getLargestValueFromDatabase():
     return row[0]
 
 
-def insertIntoNumberDataBase(numberToInsert, strikeDate, isCall):
-    connection = createDatabaseConnection()
+def insertIntoNumberDataBase(numberToInsert, positionObject):
+    strikeDate = positionObject.strikeDateTime
+    isCall = int(positionObject.isCall)
+    tickerSymbol = positionObject.ticker
 
-    cursor = connection.cursor(buffered=True)
-    now = datetime.datetime.utcnow()
-    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded,expiryDate,isCall)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\',{isCall});")
-    connection.commit()
-    closeDatabaseConnection(connection)
-
-def insertIntoNumberDataBaseInverse(numberToInsert, strikeDate, isCall):
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
     now = datetime.datetime.utcnow()
-    cursor.execute(f"INSERT INTO tickers.numberidinverse (idnumberId,dateAdded,expiryDate,isCall)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\',{isCall});")
+    cursor.execute(f"INSERT INTO tickers.numberid (idnumberId,dateAdded,expiryDate,isCall,tickerSymbol)VALUES(\'{numberToInsert}\',\'{now.strftime('%Y-%m-%d %H:%M:%S')}\',\'{strikeDate.strftime('%Y-%m-%d')}\',{isCall},\'{tickerSymbol}\');")
     connection.commit()
     closeDatabaseConnection(connection)
-
 
 def insertTickerIntoDatabase(ticker, connection, cursor):
     ticker=ticker.strip()

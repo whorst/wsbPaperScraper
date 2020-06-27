@@ -12,6 +12,7 @@ def openPosition(positionObject):
     newId = largestId+1
     ##ToDO Add logic here for short selling and inversing
     try:
+        insertPositionObjectIntoDB(newId, positionObject)
         openNormalPositions(api, newId, positionObject)
         openInversePositions(apiInverse, newId, positionObject)
     except Exception as e:
@@ -38,29 +39,26 @@ def closePositions(closePositionList):
             print("Closing Position Failed for ID:" + str(id))
             pass
 
+def insertPositionObjectIntoDB(newId, positionObject):
+    databaseTransactions.insertIntoNumberDataBase(newId, positionObject)
+
 def openNormalPositions(api, newId, positionObject):
         if (positionObject.isCall == True):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
                              client_order_id=str(newId))
-            databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime, int(positionObject.isCall))
+            # databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime, int(positionObject.isCall))
         elif (positionObject.isCall == False):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
                              client_order_id=str(newId))
-            databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime, int(positionObject.isCall))
+            # databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime, int(positionObject.isCall))
 
 def openInversePositions(api, newId, positionObject):
     if (positionObject.isCall == False):
         api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
                          client_order_id=str(newId))
-        databaseTransactions.insertIntoNumberDataBaseInverse(newId, positionObject.strikeDateTime, int(not positionObject.isCall))
     elif (positionObject.isCall == True):
         api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
                          client_order_id=str(newId))
-        databaseTransactions.insertIntoNumberDataBaseInverse(newId, positionObject.strikeDateTime, int(not positionObject.isCall))
-
-def closePositionsById():
-    api = getRestApiInterface()
-    apiInverse = getRestApiInterfaceInverse()
 
 def getRestApiInterface():
     #authentication and connection details

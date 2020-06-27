@@ -1,4 +1,5 @@
 from _datetime import datetime
+import re
 
 class validPosition:
     ticker = None
@@ -10,7 +11,7 @@ class validPosition:
     def __init__(self, newTicker, newPrice, newStrikeDate):
         self.ticker = newTicker.strip()
         self.price = newPrice.strip()
-        self.strikeDate = self.formatStrikeDate(newStrikeDate.strip())
+        self.formatStrikeDateAndDateTime(newStrikeDate.strip())
         self.getPutOrCall()
 
     def __str__(self):
@@ -19,7 +20,7 @@ class validPosition:
     def getDateTimeObjectFromStrikeDate(self, day, month, year):
         return datetime(int(year), int(month), int(day))
 
-    def formatStrikeDate(self, date):
+    def formatStrikeDateAndDateTime(self, date):
         numArray = date.split("/")
         strikeMonth = numArray[0].lstrip('0')
         strikeDay = numArray[1].lstrip('0')
@@ -29,9 +30,12 @@ class validPosition:
         if (strikeMonth < currentMonth):
             currentYear = str(int(currentYear) + 1)
 
-        self.strikeDateTime = self.getDateTimeObjectFromStrikeDate(strikeDay, strikeMonth, currentYear)
+        self.strikeDate = date
 
-        return "{}/{}/{}".format(strikeMonth, strikeDay, currentYear)
+        strikeMonth = re.sub('[^0-9]','', strikeMonth)
+        strikeDay = re.sub('[^0-9]','', strikeDay)
+
+        self.strikeDateTime = self.getDateTimeObjectFromStrikeDate(strikeDay, strikeMonth, currentYear)
 
     def getPutOrCall(self):
         priceLastCharacter = self.price[-1]
