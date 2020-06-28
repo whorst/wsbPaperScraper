@@ -10,7 +10,6 @@ def openPosition(positionObject):
     if(not largestId):
         largestId = 0
     newId = largestId+1
-    ##ToDO Add logic here for short selling and inversing
     try:
         insertPositionObjectIntoDB(newId, positionObject)
         openNormalPositions(api, newId, positionObject)
@@ -19,22 +18,26 @@ def openPosition(positionObject):
         print("Opening Position Failed for ID:" + str(newId))
         pass
 
-def closeNormalPositions(api, id, isCall):
-    api.close_position(id)
+def closeNormalPositions(api, positionObject):
+    if (positionObject.isCall == True):
+        api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market')
+    elif (positionObject.isCall == False):
+        api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market')
 
-def closeInversePositions(api, id, isCallInverse):
-    api.close_position(id)
-
+def closeInversePositions(api, positionObject):
+    if (positionObject.isCallInverse == True):
+        api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market')
+    elif (positionObject.isCallInverse == False):
+        api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market')
 
 def closePositions(closePositionList):
     api = getRestApiInterface()
     apiInverse = getRestApiInterfaceInverse()
-    for position in closePositionList:
+    for closePositionObject in closePositionList:
         try:
-            print(position)
-            exit()
-            closeNormalPositions(api, id, position.isCall)
-            closeInversePositions(apiInverse, id, position.isCallInverse)
+            closeNormalPositions(api, closePositionObject)
+            closeInversePositions(apiInverse, closePositionObject)
+            databaseTransactions.removePositionFromDatabase(closePositionObject)
         except Exception as e:
             print("Closing Position Failed for ID:" + str(id))
             pass
@@ -46,11 +49,9 @@ def openNormalPositions(api, newId, positionObject):
         if (positionObject.isCall == True):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='buy', time_in_force='gtc', type='market',
                              client_order_id=str(newId))
-            # databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime, int(positionObject.isCall))
         elif (positionObject.isCall == False):
             api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
                              client_order_id=str(newId))
-            # databaseTransactions.insertIntoNumberDataBase(newId, positionObject.strikeDateTime, int(positionObject.isCall))
 
 def openInversePositions(api, newId, positionObject):
     if (positionObject.isCall == False):

@@ -5,15 +5,19 @@ import datetime
 from redditScraper import getPositionsThatHaveExpired
 from redditScraper import closePositions
 from objects.validPositionObject import validPosition
+from objects.closePositionObject import closePosition
 from database import databaseTransactions
 
-position = validPosition("MSFT", "100", "06/27p")
+# position = validPosition("MSFT", "100", "06/28c")
+# databaseTransactions.insertIntoNumberDataBase(50, position)
 
-databaseTransactions.insertIntoNumberDataBase(48, position)
+
+# close = closePosition(49, False, "MSFT")
+# databaseTransactions.removePositionFromDatabase(close)
 
 
-me = datetime.datetime(2020, 6, 26)
-print(me.strftime('%Y-%m-%d'))
+# me = datetime.datetime(2020, 6, 26)
+# print(me.strftime('%Y-%m-%d'))
 
 # positionsToClose = getPositionsThatHaveExpired()
 # closePositions(positionsToClose)

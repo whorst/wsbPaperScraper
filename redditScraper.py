@@ -139,12 +139,11 @@ def getPositionsThatHaveExpired():
 if __name__ == '__main__':
     reddit = praw.Reddit('bot1')
     # testvalidComments()
-    #TODO: DB Eviction Given day is strike date
 
     positionsToClose = getPositionsThatHaveExpired()
-    closePositions(positionsToClose)
+    if(positionsToClose):
+        closePositions(positionsToClose)
 
-    exit()
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):

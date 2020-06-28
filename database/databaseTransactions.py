@@ -24,6 +24,13 @@ def getValidTickersInDatabase(ticker):
     closeDatabaseConnection(connection)
     return row
 
+def removePositionFromDatabase(closePositionObject):
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"DELETE FROM tickers.numberid WHERE idnumberId = {closePositionObject.id};")
+    connection.commit()
+    closeDatabaseConnection(connection)
+
 def getRecordsWithMatchingExpiryFromDatabase(expiry):
     connection = createDatabaseConnection()
     cursor = connection.cursor(buffered=True)
