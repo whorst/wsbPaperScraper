@@ -1,0 +1,5 @@
+CREATE TABLE `tickers_table` (
+        `idticker` varchar(6) NOT NULL,
+        PRIMARY KEY (`idticker`),
+        UNIQUE KEY `idtickers_table_UNIQUE` (`idticker`))
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci'

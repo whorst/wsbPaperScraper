@@ -1,0 +1,8 @@
+CREATE TABLE `numberid` (`idnumberId` int NOT NULL,
+                         `dateAdded` datetime NOT NULL,
+                         `expiryDate` datetime NOT NULL,
+                         `isCall` tinyint NOT NULL,
+                         `tickerSymbol` varchar(45) NOT NULL,
+                         PRIMARY KEY (`idnumberId`),
+                         UNIQUE KEY `idnumberId_UNIQUE` (`idnumberId`))
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci'
