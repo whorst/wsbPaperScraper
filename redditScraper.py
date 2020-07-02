@@ -73,7 +73,10 @@ def createNewPositions(doesCallReferenceExist, doesPutReferenceExist, occurences
     length = validTickersLength
     i = 0
     while (i < length):
-        newPosition = validPosition(occurencesOfTicker[i], occurencesOfPrice[i], occurencesOfStrikeDate[i])
+        try:
+            newPosition = validPosition(occurencesOfTicker[i], occurencesOfPrice[i], occurencesOfStrikeDate[i])
+        except ValueError:
+            continue
         if (newPosition.isCall == None):
             if (doesCallReferenceExist):
                 newPosition.isCall = True

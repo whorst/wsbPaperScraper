@@ -7,6 +7,8 @@ from redditScraper import closePositions
 from objects.validPositionObject import validPosition
 from objects.closePositionObject import closePosition
 from database import databaseTransactions
+from paperTrading import paperTradingUtilities
+
 
 # position = validPosition("MSFT", "100", "06/28c")
 # databaseTransactions.insertIntoNumberDataBase(50, position)
@@ -14,6 +16,11 @@ from database import databaseTransactions
 
 # close = closePosition(49, False, "MSFT")
 # databaseTransactions.removePositionFromDatabase(close)
+
+api = paperTradingUtilities.getRestApiInterface()
+print(type(api.get_barset("CLDR", "day", limit=1)["CLDR"][0].o))
+
+# i+=1
 
 
 # me = datetime.datetime(2020, 6, 26)

@@ -61,6 +61,10 @@ def openInversePositions(api, newId, positionObject):
         api.submit_order(symbol=positionObject.ticker, qty=1, side='sell', time_in_force='gtc', type='market',
                          client_order_id=str(newId))
 
+def getPriceOfStock(ticker):
+    api = getRestApiInterface()
+    return (api.get_barset(ticker, "day", limit=1)[ticker][0].o)
+
 def getRestApiInterface():
     #authentication and connection details
     api_key = 'PK88YTDVNV64L62GF2DO'

@@ -1,5 +1,6 @@
 from _datetime import datetime
 import re
+from paperTrading.paperTradingUtilities import getPriceOfStock
 
 class validPosition:
     ticker = None
@@ -10,7 +11,9 @@ class validPosition:
 
     def __init__(self, newTicker, newPrice, newStrikeDate):
         self.ticker = newTicker.strip()
-        self.price = newPrice.strip()
+        newPrice = newPrice.strip()
+        newPrice = newPrice.replace('$','')
+        self.price = newPrice
         self.formatStrikeDateAndDateTime(newStrikeDate.strip())
         self.getPutOrCall()
 
@@ -37,6 +40,12 @@ class validPosition:
 
         self.strikeDateTime = self.getDateTimeObjectFromStrikeDate(strikeDay, strikeMonth, currentYear)
 
+    def getPriceInIntOrFloat(self):
+        if ('.' in self.price):
+            return float(self.price)
+        else:
+            return int(self.price)
+
     def getPutOrCall(self):
         priceLastCharacter = self.price[-1]
         dateLastCharacter = self.strikeDate[-1]
@@ -45,3 +54,14 @@ class validPosition:
             self.isCall = False
         elif (priceLastCharacter.lower() == "c" or dateLastCharacter.lower() == "c"):
             self.isCall = True
+        else:
+            try:
+                priceOfStock = getPriceOfStock(self.ticker)
+                if(priceOfStock):
+                    formattedPrice = self.getPriceInIntOrFloat()
+                    if(formattedPrice > priceOfStock):
+                        self.isCall = True
+                    if (formattedPrice < priceOfStock):
+                        self.isCall = False
+            except Exception as e:
+                return
