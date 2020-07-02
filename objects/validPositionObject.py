@@ -9,13 +9,16 @@ class validPosition:
     strikeDateTime = None
     isCall = None
 
+
     def __init__(self, newTicker, newPrice, newStrikeDate):
         self.ticker = newTicker.strip()
         newPrice = newPrice.strip()
         newPrice = newPrice.replace('$','')
-        self.price = newPrice
+        priceWithoutStrike = self.getPriceWithoutPutOrCall(newPrice)
+        priceIntOrFloat = self.getPriceInIntOrFloat(priceWithoutStrike)
+        self.price = priceIntOrFloat
         self.formatStrikeDateAndDateTime(newStrikeDate.strip())
-        self.getPutOrCall()
+        self.getPutOrCall(newPrice)
 
     def __str__(self):
         return "{0} {1} {2} isCall: {3}".format(self.ticker, self.price, self.strikeDate, self.isCall)
@@ -40,14 +43,22 @@ class validPosition:
 
         self.strikeDateTime = self.getDateTimeObjectFromStrikeDate(strikeDay, strikeMonth, currentYear)
 
-    def getPriceInIntOrFloat(self):
-        if ('.' in self.price):
-            return float(self.price)
-        else:
-            return int(self.price)
+    @staticmethod
+    def getPriceWithoutPutOrCall(price):
+        priceWithoutStrike = price.upper()
+        priceWithoutStrike = priceWithoutStrike.replace('C', '')
+        priceWithoutStrike = priceWithoutStrike.replace('P', '')
+        return priceWithoutStrike
 
-    def getPutOrCall(self):
-        priceLastCharacter = self.price[-1]
+    @staticmethod
+    def getPriceInIntOrFloat(price):
+        if ('.' in price):
+            return float(price)
+        else:
+            return int(price)
+
+    def getPutOrCall(self, unformattedPrice):
+        priceLastCharacter = unformattedPrice[-1]
         dateLastCharacter = self.strikeDate[-1]
 
         if (priceLastCharacter.lower() == "p" or dateLastCharacter.lower() == "p"):
@@ -58,10 +69,9 @@ class validPosition:
             try:
                 priceOfStock = getPriceOfStock(self.ticker)
                 if(priceOfStock):
-                    formattedPrice = self.getPriceInIntOrFloat()
-                    if(formattedPrice > priceOfStock):
+                    if(self.price > priceOfStock):
                         self.isCall = True
-                    if (formattedPrice < priceOfStock):
+                    if (self.price < priceOfStock):
                         self.isCall = False
             except Exception as e:
                 return

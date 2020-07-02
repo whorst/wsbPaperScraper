@@ -9,6 +9,12 @@ from paperTrading import paperTradingUtilities
 import datetime
 
 
+def isStrikePriceRidiculouslyHighOrLow(strikePrice, ticker):
+    actualPrice = paperTradingUtilities.getPriceOfStock(ticker)
+    actualPriceUpperBound = actualPrice + (actualPrice *.65)
+    actualPriceLowerBound = actualPrice - (actualPrice *.65)
+    return ((strikePrice > actualPriceUpperBound) or (strikePrice < actualPriceLowerBound))
+
 def isPutReferenceInComment(comment):
     return bool(re.findall(r'\bput\b|\bputs\b', comment.lower()))
 
@@ -112,7 +118,7 @@ def searchCommentsForPositions(submission_id, commentObject):
                 if (validPositions):
                     for pos in validPositions:
                         print(pos.__str__())
-                        if (pos.isCall != None):  ###Add Refactor Logic Here Later
+                        if((pos.isCall != None) and (not isStrikePriceRidiculouslyHighOrLow(pos.price, pos.ticker))):
                             paperTradingUtilities.openPosition(pos)
         except UnicodeEncodeError:
             pass
@@ -122,7 +128,7 @@ def testvalidComments():
         validPositions = returnValidPositionsInComment(comment)
         if(validPositions):
             for pos in validPositions:
-                if(pos.isCall != None):   ###Add Refactor Logic Here Later
+                if((pos.isCall != None) and (not isStrikePriceRidiculouslyHighOrLow(pos.price, pos.ticker))):
                     paperTradingUtilities.openPosition(pos)
         else:
             continue

@@ -11,6 +11,7 @@ from paperTrading import paperTradingUtilities
 
 
 # position = validPosition("MSFT", "100", "06/28c")
+# print(position)
 # databaseTransactions.insertIntoNumberDataBase(50, position)
 
 
