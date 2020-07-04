@@ -1,14 +1,17 @@
 import re
 import enchant
 from nltk.corpus import words
-import datetime
 from redditScraper import getPositionsThatHaveExpired
-from redditScraper import closePositions
 from objects.validPositionObject import validPosition
 from objects.closePositionObject import closePosition
 from database import databaseTransactions
 from paperTrading import paperTradingUtilities
+from timeUtilities import timeUtilities
 
+import datetime
+from pytz import timezone
+tz = timezone('EST')
+print(timeUtilities.getCurrentHourEst())
 
 # position = validPosition("MSFT", "100", "06/28c")
 # print(position)
@@ -18,8 +21,10 @@ from paperTrading import paperTradingUtilities
 # close = closePosition(49, False, "MSFT")
 # databaseTransactions.removePositionFromDatabase(close)
 
-api = paperTradingUtilities.getRestApiInterface()
-print(type(api.get_barset("CLDR", "day", limit=1)["CLDR"][0].o))
+# print(datetime.datetime.utcnow().strftime('%Y-%m-%d %h:%m:%s'))
+
+# api = paperTradingUtilities.getRestApiInterface()
+# print(type(api.get_barset("CLDR", "day", limit=1)["CLDR"][0].o))
 
 # i+=1
 

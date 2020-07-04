@@ -1,7 +1,7 @@
 import alpaca_trade_api as tradeapi
 from database import databaseTransactions
 
-# Add logic for adding ticker to the DB
+# Add logic for closing position at end of the day, figuring out why adding to DB doesnt work
 
 def openPosition(positionObject):
     api = getRestApiInterface()
@@ -39,7 +39,7 @@ def closePositions(closePositionList):
             closeInversePositions(apiInverse, closePositionObject)
             databaseTransactions.removePositionFromDatabase(closePositionObject)
         except Exception as e:
-            print("Closing Position Failed for ID:" + str(id))
+            print("Closing Position Failed for ID:" + str(closePositionObject.id))
             pass
 
 def insertPositionObjectIntoDB(newId, positionObject):

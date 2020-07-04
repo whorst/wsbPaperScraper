@@ -4,9 +4,8 @@ import praw
 from database.databaseTransactions import getValidTickersInDatabase
 from database.databaseTransactions import getRecordsWithMatchingExpiryFromDatabase
 from objects.validPositionObject import validPosition
-from paperTrading.paperTradingUtilities import closePositions
 from paperTrading import paperTradingUtilities
-import datetime
+from timeUtilities import timeUtilities
 
 
 def isStrikePriceRidiculouslyHighOrLow(strikePrice, ticker):
@@ -117,8 +116,8 @@ def searchCommentsForPositions(submission_id, commentObject):
                 validPositions = returnValidPositionsInComment(commentObject.body)
                 if (validPositions):
                     for pos in validPositions:
-                        print(pos.__str__())
                         if((pos.isCall != None) and (not isStrikePriceRidiculouslyHighOrLow(pos.price, pos.ticker))):
+                            print(pos.__str__())
                             paperTradingUtilities.openPosition(pos)
         except UnicodeEncodeError:
             pass
@@ -133,11 +132,8 @@ def testvalidComments():
         else:
             continue
 
-def getCurrentDay():
-    return datetime.datetime.utcnow().strftime('%Y-%m-%d')
-
 def getPositionsThatHaveExpired():
-    day = getCurrentDay()
+    day = timeUtilities.getCurrentDayEst()
     return getRecordsWithMatchingExpiryFromDatabase(day)
 
     # me = datetime.datetime(2020, 6, 26)
@@ -149,15 +145,16 @@ if __name__ == '__main__':
     reddit = praw.Reddit('bot1')
     # testvalidComments()
 
-    positionsToClose = getPositionsThatHaveExpired()
-    if(positionsToClose):
-        closePositions(positionsToClose)
-
     for submission in reddit.subreddit("wallstreetbets").hot(limit=1):
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):
             for commentObject in reddit.subreddit("wallstreetbets").stream.comments():
-                searchCommentsForPositions(submission.id, commentObject)
+                if(timeUtilities.getCurrentHourEst() is not "17"):
+                    searchCommentsForPositions(submission.id, commentObject)
+                else:
+                    positionsToClose = getPositionsThatHaveExpired()
+                    if (positionsToClose):
+                        paperTradingUtilities.closePositions(positionsToClose)
 
         if ("What Are Your Moves Tomorrow" in submission.title):
             for comment in reddit.subreddit("wallstreetbets").stream.comments():
