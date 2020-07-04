@@ -3,6 +3,9 @@ from database import databaseTransactions
 
 # Add logic for closing position at end of the day, figuring out why adding to DB doesnt work
 
+def isStockShortable(ticker, api):
+    return api.get_asset(ticker).__getattr__('shortable')
+
 def openPosition(positionObject):
     api = getRestApiInterface()
     apiInverse = getRestApiInterfaceInverse()
@@ -11,11 +14,12 @@ def openPosition(positionObject):
         largestId = 0
     newId = largestId+1
     try:
-        insertPositionObjectIntoDB(newId, positionObject)
-        openNormalPositions(api, newId, positionObject)
-        openInversePositions(apiInverse, newId, positionObject)
+        if(isStockShortable(positionObject.ticker, api)):
+            openNormalPositions(api, newId, positionObject)
+            openInversePositions(apiInverse, newId, positionObject)
+            insertPositionObjectIntoDB(newId, positionObject)
     except Exception as e:
-        print("Opening Position Failed for ID:" + str(newId))
+        print("Opening Position Failed for ID:" + str(newId) + " For reason" + str(e))
         pass
 
 def closeNormalPositions(api, positionObject):

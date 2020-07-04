@@ -149,7 +149,7 @@ if __name__ == '__main__':
         print(submission.title)
         if ("Daily Discussion Thread for" in submission.title):
             for commentObject in reddit.subreddit("wallstreetbets").stream.comments():
-                if(timeUtilities.getCurrentHourEst() is not "17"):
+                if(timeUtilities.getCurrentHourEst() != "17"):
                     searchCommentsForPositions(submission.id, commentObject)
                 else:
                     positionsToClose = getPositionsThatHaveExpired()

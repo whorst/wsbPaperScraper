@@ -13,7 +13,9 @@ from pytz import timezone
 tz = timezone('EST')
 print(timeUtilities.getCurrentHourEst())
 
-# position = validPosition("MSFT", "100", "06/28c")
+# position = validPosition("VXX", "40", "09/28c")
+# paperTradingUtilities.openPosition(position)
+
 # print(position)
 # databaseTransactions.insertIntoNumberDataBase(50, position)
 
@@ -23,9 +25,9 @@ print(timeUtilities.getCurrentHourEst())
 
 # print(datetime.datetime.utcnow().strftime('%Y-%m-%d %h:%m:%s'))
 
-# api = paperTradingUtilities.getRestApiInterface()
+api = paperTradingUtilities.getRestApiInterface()
 # print(type(api.get_barset("CLDR", "day", limit=1)["CLDR"][0].o))
-
+print(api.get_asset("MSFT").__getattr__('shortable'))
 # i+=1
 
 
