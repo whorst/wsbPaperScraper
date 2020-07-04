@@ -6,6 +6,11 @@ from database import databaseTransactions
 def isStockShortable(ticker, api):
     return api.get_asset(ticker).__getattr__('shortable')
 
+def writeFailureToFile(msg):
+    outFile = open("resources/files/closePositionFailure", "a")
+    outFile.write(msg+"\n\n")
+    outFile.close()
+
 def openPosition(positionObject):
     api = getRestApiInterface()
     apiInverse = getRestApiInterfaceInverse()
@@ -43,7 +48,8 @@ def closePositions(closePositionList):
             closeInversePositions(apiInverse, closePositionObject)
             databaseTransactions.removePositionFromDatabase(closePositionObject)
         except Exception as e:
-            print("Closing Position Failed for ID:" + str(closePositionObject.id))
+            print("Closing Position Failed for ID:" + str(closePositionObject.id) + " For reason" + str(e))
+            writeFailureToFile(str(e))
             pass
 
 def insertPositionObjectIntoDB(newId, positionObject):
