@@ -3,8 +3,14 @@ from database import databaseTransactions
 
 # Add logic for closing position at end of the day, figuring out why adding to DB doesnt work
 
-def isStockShortable(ticker, api):
-    return api.get_asset(ticker).__getattr__('shortable')
+def isStockShortable(ticker):
+    api = getRestApiInterface()
+    resultInDatabase = databaseTransactions.getIsTickerShortable(ticker)[0]
+    if(resultInDatabase == None):
+        apiCallIsShortable = api.get_asset(ticker).__getattr__('shortable')
+        databaseTransactions.insertIsTickerShortable(ticker, int(apiCallIsShortable))
+        return apiCallIsShortable
+    return bool(resultInDatabase)
 
 def writeFailureToFile(msg):
     outFile = open("resources/files/closePositionFailure", "a")

@@ -12,6 +12,21 @@ def createDatabaseConnection():
     return cnx
 
 
+def getIsTickerShortable(ticker):
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"SELECT isShortable FROM tickers.tickers_table where idticker = \'{ticker}\';")
+    row = cursor.fetchone()
+    closeDatabaseConnection(connection)
+    return row
+
+def insertIsTickerShortable(ticker, isShortable):
+    connection = createDatabaseConnection()
+    cursor = connection.cursor(buffered=True)
+    cursor.execute(f"UPDATE tickers.tickers_table set isShortable = {isShortable} WHERE idTicker = \'{ticker}\';")
+    connection.commit()
+    closeDatabaseConnection(connection)
+
 def closeDatabaseConnection(connection):
     connection.cursor().close()
     connection.close()
