@@ -12,7 +12,14 @@ def isStrikePriceRidiculouslyHighOrLow(strikePrice, ticker):
     actualPrice = paperTradingUtilities.getPriceOfStock(ticker)
     actualPriceUpperBound = actualPrice + (actualPrice *.65)
     actualPriceLowerBound = actualPrice - (actualPrice *.65)
-    return ((strikePrice > actualPriceUpperBound) or (strikePrice < actualPriceLowerBound))
+    isRidiculouslyHighOrLow = ((strikePrice > actualPriceUpperBound) or (strikePrice < actualPriceLowerBound))
+    if(isRidiculouslyHighOrLow):
+        comment = (f"Ticker: {ticker}, Actual Price: {actualPrice}, Upper: {actualPriceUpperBound}, Lower {actualPriceLowerBound}")
+        outFile = open("resources/files/ridiculouslyHighOrLowReason", "a")
+        outFile.write(comment)
+        outFile.write("\n\n")
+        outFile.close()
+    return isRidiculouslyHighOrLow
 
 def isPutReferenceInComment(comment):
     return bool(re.findall(r'\bput\b|\bputs\b', comment.lower()))
@@ -58,10 +65,6 @@ def returnValidPositionsInComment(comment):
     occurencesOfStrikeDate = getStrikeDatesInComment(comment)
     occurencesOfPrice = getPriceInComment(comment)
     occurencesOfTicker = getTickerInComment(comment)
-    # doesPutReferenceExist = isPutReferenceInComment(comment)
-    # doesCallReferenceExist = isCallReferenceInComment(comment)
-
-    ##TODO If there's a price but not a put or call reference, check the current price of the stock and determine if stock is put or call
 
     validTickers = getValidTickersFromPotentialTickers(occurencesOfTicker)
 
