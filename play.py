@@ -10,11 +10,13 @@ from timeUtilities import timeUtilities
 
 import datetime
 from pytz import timezone
-tz = timezone('EST')
-print(timeUtilities.getCurrentHourEst())
+# tz = timezone('EST')
+# print(timeUtilities.getCurrentHourEst())
+api = paperTradingUtilities.getRestApiInterface()
+print(type(paperTradingUtilities.getPriceOfStock("MSFT")))
 
 # print(databaseTransactions.insertIsTickerShortable("GLD", 1))
-print(paperTradingUtilities.isStockShortable("WORK"))
+# print(paperTradingUtilities.isStockShortable("WORK"))
 
 # position = validPosition("VXX", "40", "09/28c")
 # paperTradingUtilities.openPosition(position)

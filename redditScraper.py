@@ -52,14 +52,16 @@ def getMostCommonTickers():
 def getExclusionWord():
     return ["ALL", "US", "USSR", "THE", "ITM", "AND", "RIP" "OTM", "ASAP", "USD", "EOD", "CAD", "PE", "YOLO", "I", "SAAS", "GIGS",
             "GDP", "GTFO", "BTFD", "EXP", "OTM", "MINS", "PP", "DD", "LMAO", "LOL", "AMA", "TLDR", "RN", "TME", "GUH", "FUK",
-            "WUT", "WAT","WSB", "TEH", "WTF", "FOMO", "IDK", "AI", "TP","IV", "DOWN", "IMO", "PLS"]
+            "WUT", "WAT","WSB", "TEH", "WTF", "FOMO", "IDK", "AI", "TP", "IV", "DOWN", "IMO", "PLS"]
 
 def returnValidPositionsInComment(comment):
     occurencesOfStrikeDate = getStrikeDatesInComment(comment)
     occurencesOfPrice = getPriceInComment(comment)
     occurencesOfTicker = getTickerInComment(comment)
-    doesPutReferenceExist = isPutReferenceInComment(comment)
-    doesCallReferenceExist = isCallReferenceInComment(comment)
+    # doesPutReferenceExist = isPutReferenceInComment(comment)
+    # doesCallReferenceExist = isCallReferenceInComment(comment)
+
+    ##TODO If there's a price but not a put or call reference, check the current price of the stock and determine if stock is put or call
 
     validTickers = getValidTickersFromPotentialTickers(occurencesOfTicker)
 
@@ -68,11 +70,11 @@ def returnValidPositionsInComment(comment):
     occurencesOfStrikeDateLength = len(occurencesOfStrikeDate)
 
     if((validTickersLength == occurencesOfPriceLength == occurencesOfStrikeDateLength) and validTickersLength!=0):
-        return createNewPositions(doesCallReferenceExist, doesPutReferenceExist, occurencesOfPrice, occurencesOfStrikeDate, validTickers, validTickersLength)
+        return createNewPositions(occurencesOfPrice, occurencesOfStrikeDate, validTickers, validTickersLength)
     else:
         return []
 
-def createNewPositions(doesCallReferenceExist, doesPutReferenceExist, occurencesOfPrice, occurencesOfStrikeDate,
+def createNewPositions(occurencesOfPrice, occurencesOfStrikeDate,
                        occurencesOfTicker, validTickersLength):
     validPositions = []
     length = validTickersLength
@@ -83,10 +85,14 @@ def createNewPositions(doesCallReferenceExist, doesPutReferenceExist, occurences
         except ValueError:
             continue
         if (newPosition.isCall == None):
-            if (doesCallReferenceExist):
-                newPosition.isCall = True
-            if (doesPutReferenceExist):
+            currentPrice = paperTradingUtilities.getPriceOfStock(newPosition.ticker)
+            strikePrice = newPosition.price
+
+            if(strikePrice<currentPrice):
                 newPosition.isCall = False
+            else:
+                newPosition.isCall = True
+
         validPositions.append(newPosition)
         i += 1
     return validPositions

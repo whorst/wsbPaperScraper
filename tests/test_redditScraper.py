@@ -26,6 +26,7 @@ def createCommentObject(body, link_id):
 class TestSearchCommentsForPositions(unittest.TestCase):
 
     @patch('redditScraper.getValidTickersFromPotentialTickers', MagicMock(return_value=["MSFT"]))
+    @patch('redditScraper.isStrikePriceRidiculouslyHighOrLow', MagicMock(return_value=False))
     def test_searchCommentsForPositions_ShouldCreateOpenPosition_When_CommentIsValid(self):
         commentObject = createCommentObject("Im gonna get my money MSFT 370p 4/14", "0000123567")
         submission_id = "123567"
