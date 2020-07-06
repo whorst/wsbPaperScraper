@@ -25,7 +25,7 @@ def openPosition(positionObject):
         largestId = 0
     newId = largestId+1
     try:
-        if(isStockShortable(positionObject.ticker, api)):
+        if(isStockShortable(positionObject.ticker)):
             openNormalPositions(api, newId, positionObject)
             openInversePositions(apiInverse, newId, positionObject)
             insertPositionObjectIntoDB(newId, positionObject)
@@ -50,6 +50,7 @@ def closePositions(closePositionList):
     apiInverse = getRestApiInterfaceInverse()
     for closePositionObject in closePositionList:
         try:
+            print("Closed Position" + str(closePositionObject.id))
             closeNormalPositions(api, closePositionObject)
             closeInversePositions(apiInverse, closePositionObject)
             databaseTransactions.removePositionFromDatabase(closePositionObject)

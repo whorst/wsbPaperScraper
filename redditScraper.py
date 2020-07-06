@@ -14,7 +14,7 @@ def isStrikePriceRidiculouslyHighOrLow(strikePrice, ticker):
     actualPriceLowerBound = actualPrice - (actualPrice *.65)
     isRidiculouslyHighOrLow = ((strikePrice > actualPriceUpperBound) or (strikePrice < actualPriceLowerBound))
     if(isRidiculouslyHighOrLow):
-        comment = (f"Ticker: {ticker}, Actual Price: {actualPrice}, Upper: {actualPriceUpperBound}, Lower {actualPriceLowerBound}")
+        comment = (f"Ticker: {ticker}, Actual Price: {actualPrice}, Upper: {actualPriceUpperBound}, Lower {actualPriceLowerBound}, Stated Price: {strikePrice}")
         outFile = open("resources/files/ridiculouslyHighOrLowReason", "a")
         outFile.write(comment)
         outFile.write("\n\n")
@@ -87,14 +87,7 @@ def createNewPositions(occurencesOfPrice, occurencesOfStrikeDate,
             newPosition = validPosition(occurencesOfTicker[i], occurencesOfPrice[i], occurencesOfStrikeDate[i])
         except ValueError:
             continue
-        if (newPosition.isCall == None):
-            currentPrice = paperTradingUtilities.getPriceOfStock(newPosition.ticker)
-            strikePrice = newPosition.price
 
-            if(strikePrice<currentPrice):
-                newPosition.isCall = False
-            else:
-                newPosition.isCall = True
 
         validPositions.append(newPosition)
         i += 1
@@ -164,7 +157,14 @@ if __name__ == '__main__':
                     positionsToClose = getPositionsThatHaveExpired()
                     if (positionsToClose):
                         paperTradingUtilities.closePositions(positionsToClose)
+                    exit(0)
 
         if ("What Are Your Moves Tomorrow" in submission.title):
             for comment in reddit.subreddit("wallstreetbets").stream.comments():
-                searchCommentsForPositions(submission.id, commentObject)
+                if (timeUtilities.getCurrentHourEst() != "17"):
+                    searchCommentsForPositions(submission.id, comment)
+                else:
+                    positionsToClose = getPositionsThatHaveExpired()
+                    if (positionsToClose):
+                        paperTradingUtilities.closePositions(positionsToClose)
+                    exit(0)

@@ -74,4 +74,5 @@ class validPosition:
                     if (self.price < priceOfStock):
                         self.isCall = False
             except Exception as e:
+                print("Couldnt get stock price")
                 return
